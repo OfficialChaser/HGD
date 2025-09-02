@@ -26,9 +26,9 @@ function love.load()
     love.graphics.setFont(smallFont)
 
     sounds = {
-        ['paddle_hit'] = love.audio.newSource('sounds/paddle_hit.wav', 'static')
-        -- ['score'] = love.audio.newSource('sounds/score.wav', 'static'),
-        -- ['wall_hit'] = love.audio.newSource('sounds/wall_hit.wav', 'static')
+        ['paddle_hit'] = love.audio.newSource('sounds/paddle_hit.wav', 'static'),
+        ['score'] = love.audio.newSource('sounds/score.wav', 'static'),
+        ['wall_hit'] = love.audio.newSource('sounds/wall_hit.wav', 'static')
     }
 
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
@@ -66,6 +66,7 @@ function love.update(dt)
         if ball.x + ball.width < player1.x then 
             servingPlayer = 1
             player2.score = player2.score + 1
+            sounds['score']:play()
 
             if player2.score == 7 then 
                 winningPlayer = 2
@@ -80,6 +81,7 @@ function love.update(dt)
         if ball.x > player2.x + player2.width then 
             servingPlayer = 2
             player1.score = player1.score + 1
+            sounds['score']:play()
 
             if player1.score == 7 then 
                 winningPlayer = 1
@@ -119,12 +121,14 @@ function love.update(dt)
         if ball.y <= 0 then 
             ball.y = 0
             ball.dy = -ball.dy
+            sounds['wall_hit']:play()
         end
 
         -- collision with bottom of screen
         if ball.y + ball.height >= VIRTUAL_HEIGHT then 
             ball.y = VIRTUAL_HEIGHT - ball.height 
             ball.dy = -ball.dy 
+            sounds['wall_hit']:play()
         end
     end
 
@@ -136,12 +140,14 @@ function love.update(dt)
         player1.dy = 0
     end
 
-    if love.keyboard.isDown('up') then 
-        player2.dy = -PADDLE_SPEED
-    elseif love.keyboard.isDown('down') then 
-        player2.dy = PADDLE_SPEED 
-    else
-        player2.dy = 0
+    if gameState == 'play' and ball.dx < 0 then
+        if ball.y > player2.y then 
+            player2.dy = PADDLE_SPEED
+        elseif ball.y < player2.y then
+            player2.dy = -PADDLE_SPEED 
+        else
+            player2.dy = 0
+        end
     end
 
     if gameState == 'play' then 
