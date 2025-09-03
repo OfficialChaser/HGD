@@ -11,6 +11,7 @@ VIRTUAL_WIDTH = 432
 VIRTUAL_HEIGHT = 243
 
 PADDLE_SPEED = 200
+CPU_SPEED = PADDLE_SPEED * 0.8
 
 function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
@@ -50,6 +51,32 @@ end
 
 function love.resize(w, h)
     push:resize(w, h)
+end
+
+function predictBallY(ball)
+    -- Only predict if ball is moving towards player2
+    if ball.dx <= 0 then
+        return VIRTUAL_HEIGHT / 2 -- fallback to center
+    end
+
+    local predictedY = ball.y
+    local predictedDY = ball.dy
+    local predictedX = ball.x
+    local timeToPaddle = (player2.x - ball.x) / ball.dx
+
+    -- Simulate vertical bounces
+    predictedY = predictedY + predictedDY * timeToPaddle
+
+    -- Account for wall bounces
+    while predictedY < 0 or predictedY + ball.height > VIRTUAL_HEIGHT do
+        if predictedY < 0 then
+            predictedY = -predictedY
+        elseif predictedY + ball.height > VIRTUAL_HEIGHT then
+            predictedY = 2 * (VIRTUAL_HEIGHT - ball.height) - predictedY
+        end
+    end
+
+    return predictedY
 end
 
 function love.update(dt)
@@ -140,12 +167,22 @@ function love.update(dt)
         player1.dy = 0
     end
 
-    if gameState == 'play' and ball.dx < 0 then
-        if ball.y > player2.y then 
-            player2.dy = PADDLE_SPEED
-        elseif ball.y < player2.y then
-            player2.dy = -PADDLE_SPEED 
+    if gameState == 'play' then 
+        local targetY = predictBallY(ball)
+        local paddleCenter = player2.y + player2.height / 2
+        local deadZone = 2
+        if ball.dx > 0 and ball.x > VIRTUAL_WIDTH / 2 then
+            if math.abs(targetY + ball.height / 2 - paddleCenter) > deadZone then
+                if targetY + ball.height / 2 > paddleCenter then
+                    player2.dy = CPU_SPEED
+                else
+                    player2.dy = -CPU_SPEED
+                end
+            else
+                player2.dy = 0
+            end
         else
+            -- change later
             player2.dy = 0
         end
     end
