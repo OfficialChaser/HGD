@@ -5,7 +5,8 @@ function Ball:init(x, y, width, height)
     self.x = x 
     self.y = y 
     self.width = width 
-    self.height = height 
+    self.height = height
+    self.color = {255/255, 255/255, 255/255}
 
     -- self.dx = math.random(2) == 1 and 100 or -100
     -- self.dy = math.random(-50, 50)
@@ -20,6 +21,7 @@ function Ball:collides(paddle)
         return false
     end
 
+    self.color = {math.max(0.4, math.random()), math.max(0.4, math.random()), math.max(0.4, math.random())}
     return true
 end
 
@@ -36,5 +38,6 @@ function Ball:update(dt)
 end
 
 function Ball:render()
+    love.graphics.setColor(self.color[1], self.color[2], self.color[3], 1)
     love.graphics.rectangle('fill', self.x, self.y, self.width, self.height)
 end

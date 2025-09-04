@@ -13,6 +13,10 @@ VIRTUAL_HEIGHT = 243
 PADDLE_SPEED = 200
 CPU_SPEED = PADDLE_SPEED * 0.8
 
+WINNING_SCORE = 5
+
+currentDifficulty = 'Choose one!'
+
 function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
@@ -53,32 +57,6 @@ function love.resize(w, h)
     push:resize(w, h)
 end
 
-function predictBallY(ball)
-    -- Only predict if ball is moving towards player2
-    if ball.dx <= 0 then
-        return VIRTUAL_HEIGHT / 2 -- fallback to center
-    end
-
-    local predictedY = ball.y
-    local predictedDY = ball.dy
-    local predictedX = ball.x
-    local timeToPaddle = (player2.x - ball.x) / ball.dx
-
-    -- Simulate vertical bounces
-    predictedY = predictedY + predictedDY * timeToPaddle
-
-    -- Account for wall bounces
-    while predictedY < 0 or predictedY + ball.height > VIRTUAL_HEIGHT do
-        if predictedY < 0 then
-            predictedY = -predictedY
-        elseif predictedY + ball.height > VIRTUAL_HEIGHT then
-            predictedY = 2 * (VIRTUAL_HEIGHT - ball.height) - predictedY
-        end
-    end
-
-    return predictedY
-end
-
 function love.update(dt)
     if gameState == 'serve' then 
         ball.dy = math.random(-50, 50)
@@ -95,7 +73,7 @@ function love.update(dt)
             player2.score = player2.score + 1
             sounds['score']:play()
 
-            if player2.score == 7 then 
+            if player2.score == WINNING_SCORE then 
                 winningPlayer = 2
                 gameState = 'win'
             else
@@ -110,7 +88,7 @@ function love.update(dt)
             player1.score = player1.score + 1
             sounds['score']:play()
 
-            if player1.score == 7 then 
+            if player1.score == WINNING_SCORE then 
                 winningPlayer = 1
                 gameState = 'win'
             else
@@ -129,6 +107,7 @@ function love.update(dt)
                 ball.dy = math.random(10, 150)
             end
 
+            sounds['paddle_hit']:setPitch(math.random(90, 110) / 100)
             sounds['paddle_hit']:play()
         end
         if ball:collides(player2) then 
@@ -141,6 +120,7 @@ function love.update(dt)
                 ball.dy = math.random(10, 150)
             end
 
+            sounds['paddle_hit']:setPitch(math.random(110, 130) / 100)
             sounds['paddle_hit']:play()
         end
 
@@ -157,6 +137,8 @@ function love.update(dt)
             ball.dy = -ball.dy 
             sounds['wall_hit']:play()
         end
+
+        ball:update(dt)
     end
 
     if love.keyboard.isDown('w') then 
@@ -167,28 +149,43 @@ function love.update(dt)
         player1.dy = 0
     end
 
-    if gameState == 'play' then 
-        local targetY = predictBallY(ball)
-        local paddleCenter = player2.y + player2.height / 2
-        local deadZone = 2
-        if ball.dx > 0 and ball.x > VIRTUAL_WIDTH / 2 then
-            if math.abs(targetY + ball.height / 2 - paddleCenter) > deadZone then
-                if targetY + ball.height / 2 > paddleCenter then
+    if gameState == 'play' then
+        local ballCenter = ball.y + ball.height / 2
+        local player2Center = player2.y + player2.height / 2
+        local deadzone = 5
+
+        if currentDifficulty == 'Medium' or currentDifficulty == 'Hard' then
+            if ball.dx > 0 and ball.x > VIRTUAL_WIDTH / 4 then
+                if ballCenter > player2Center + deadzone then
                     player2.dy = CPU_SPEED
-                else
+                elseif ballCenter < player2Center - deadzone then
                     player2.dy = -CPU_SPEED
+                else
+                    player2.dy = 0
+                end
+            elseif ball.dx < 0 and ball.x < VIRTUAL_WIDTH / 2 and currentDifficulty == 'Hard' then
+                if player2Center < VIRTUAL_HEIGHT / 2 - deadzone then
+                    player2.dy = CPU_SPEED
+                elseif player2Center > VIRTUAL_HEIGHT / 2 + deadzone then
+                    player2.dy = -CPU_SPEED
+                else
+                    player2.dy = 0
+                end
+            end
+        elseif currentDifficulty == 'Easy' then
+            deadzone = 10
+            if ball.dx > 0 and ball.x > VIRTUAL_WIDTH / 2 then
+                if ballCenter > player2Center + deadzone then
+                    player2.dy = CPU_SPEED
+                elseif ballCenter < player2Center - deadzone then
+                    player2.dy = -CPU_SPEED
+                else
+                    player2.dy = 0
                 end
             else
                 player2.dy = 0
             end
-        else
-            -- change later
-            player2.dy = 0
         end
-    end
-
-    if gameState == 'play' then 
-        ball:update(dt)
     end
 
     player1:update(dt)
@@ -198,13 +195,11 @@ end
 function love.keypressed(key)
     if key == 'escape' then 
         love.event.quit()
-    elseif key == 'enter' or key == 'return' then 
-        if gameState == 'start' then 
-            gameState = 'serve'
-        elseif gameState == 'serve' then 
+    elseif key == 'enter' or key == 'return' or key == 'space' then 
+        if gameState == 'serve' then 
             gameState = 'play'
         elseif gameState == 'win' then 
-            gameState = 'serve'
+            gameState = 'start'
 
             ball:reset()
 
@@ -223,12 +218,13 @@ end
 function love.draw()
     push:apply('start')
 
-    love.graphics.clear(40/255, 45/255, 52/255, 255/255)
+    love.graphics.clear(0, 0, 0, 255/255)
 
     love.graphics.setFont(smallFont)
     if gameState == 'start' then
         love.graphics.printf('Hello Pong!', 0, 20, VIRTUAL_WIDTH, 'center')
         displayScores()
+        displayButtons()
     elseif gameState == 'serve' then 
         love.graphics.printf('Player ' .. tostring(servingPlayer) .. ' to serve', 0, 20, VIRTUAL_WIDTH, 'center')
         displayScores()
@@ -244,15 +240,18 @@ function love.draw()
     player2:render()
     ball:render()
 
-    displayFPS()
+    displayUI()
 
     push:apply('end')
 end
 
-function displayFPS()
+function displayUI()
     love.graphics.setFont(smallFont)
     love.graphics.setColor(0, 255/255, 0, 255/255)
     love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 10, 10)
+
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.printf('Difficulty: ' .. tostring(currentDifficulty), 0, 10, VIRTUAL_WIDTH - 5, "right")
 end
 
 function displayScores()
@@ -260,4 +259,66 @@ function displayScores()
     love.graphics.setFont(scoreFont)
     love.graphics.print(tostring(player1.score), VIRTUAL_WIDTH / 2 - 50, VIRTUAL_HEIGHT / 3)
     love.graphics.print(tostring(player2.score), VIRTUAL_WIDTH / 2 + 30, VIRTUAL_HEIGHT / 3)
+end
+
+function displayButtons()
+    -- draw buttons
+    love.graphics.setFont(largeFont)
+    love.graphics.print('Choose difficulty:', VIRTUAL_WIDTH / 2 - 70, VIRTUAL_HEIGHT / 3 + 60)
+
+    -- locals
+    local easyButton = {x = VIRTUAL_WIDTH / 2 - 18, y = VIRTUAL_HEIGHT / 3 + 80, width = 36, height = 13}
+    local mediumButton = {x = VIRTUAL_WIDTH / 2 - 28, y = VIRTUAL_HEIGHT / 3 + 100, width = 58, height = 13}
+    local hardButton = {x = VIRTUAL_WIDTH / 2 - 18, y = VIRTUAL_HEIGHT / 3 + 120, width = 36, height = 13}
+
+    if isButtonHovered(easyButton.x, easyButton.y, easyButton.width, easyButton.height) then
+        -- do something for easy button hover
+        love.graphics.setColor(0, 255/255, 0, 255/255)
+        checkMousePressed('Easy')
+    else
+        love.graphics.setColor(0, 255/255, 0, 100/255)
+    end
+    love.graphics.print('Easy', easyButton.x, easyButton.y)
+    if isButtonHovered(mediumButton.x, mediumButton.y, mediumButton.width, mediumButton.height) then
+        -- do something for medium button hover
+        love.graphics.setColor(255/255, 255/255, 0, 255/255)
+        checkMousePressed('Medium')
+    else
+        love.graphics.setColor(255/255, 255/255, 0, 100/255)
+    end
+    love.graphics.print('Medium', mediumButton.x, mediumButton.y)
+    if isButtonHovered(hardButton.x, hardButton.y, hardButton.width, hardButton.height) then
+        -- do something for hard button hover
+        love.graphics.setColor(255/255, 0, 0, 255/255)
+        checkMousePressed('Hard')
+    else
+        love.graphics.setColor(255/255, 0, 0, 100/255)
+    end
+    love.graphics.print('Hard', hardButton.x, hardButton.y)
+end
+
+function isButtonHovered(bx, by, bw, bh)
+    local mx, my = love.mouse.getPosition()
+    mx = mx * VIRTUAL_WIDTH / WINDOW_WIDTH
+    my = my * VIRTUAL_HEIGHT / WINDOW_HEIGHT
+
+    return mx >= bx and mx <= bx + bw and my >= by and my <= by + bh
+end
+
+function checkMousePressed(difficulty)
+    if love.mouse.isDown(1) then
+        setDifficulty(difficulty)
+    end
+end
+
+function setDifficulty(difficulty)
+    currentDifficulty = difficulty
+    if difficulty == 'Easy' then
+        CPU_SPEED = PADDLE_SPEED * 0.6
+    elseif difficulty == 'Medium' then
+        CPU_SPEED = PADDLE_SPEED * 0.7
+    elseif difficulty == 'Hard' then
+        CPU_SPEED = PADDLE_SPEED * 0.8
+    end
+    gameState = 'serve'
 end
