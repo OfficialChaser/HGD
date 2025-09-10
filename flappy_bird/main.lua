@@ -2,6 +2,8 @@ push = require 'lib/push'
 Class = require 'lib/class'
 
 require 'Bird'
+require 'Pipe'
+require 'PipePair'
 
 local back_clouds_scroll = 0
 local middle_clouds_scroll = 0
@@ -24,6 +26,11 @@ local middle_clouds = love.graphics.newImage('graphics/middle_clouds.png')
 local front_clouds = love.graphics.newImage('graphics/front_clouds.png')
 
 local bird = Bird()
+
+local pipe_pairs = {}
+local pipe_spawn_timer = 0
+local last_pipe_y = -PIPE_HEIGHT + math.random(80) + 20
+
 
 function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
@@ -55,12 +62,33 @@ function love.keypressed(key)
 end
 
 function love.update(dt)
+
+    pipe_spawn_timer = pipe_spawn_timer + dt
+    if pipe_spawn_timer > 2 then
+        local y = math.max(-PIPE_HEIGHT + 10, 
+            math.min(last_pipe_y + math.random(-20, 20), VIRTUAL_HEIGHT - 90 - PIPE_HEIGHT))
+        last_pipe_y = y
+        table.insert(pipe_pairs, PipePair(y))
+        pipe_spawn_timer = 0
+    end
+
     back_clouds_scroll = (back_clouds_scroll + BACK_CLOUDS_SCROLL_SPEED * dt) % (back_clouds:getWidth() / 2)
     middle_clouds_scroll = (middle_clouds_scroll + MIDDLE_CLOUDS_SCROLL_SPEED * dt) % (middle_clouds:getWidth() / 2)
     front_clouds_scroll = (front_clouds_scroll + FRONT_CLOUDS_SCROLL_SPEED * dt) % (front_clouds:getWidth() / 2)
 
     bird:update(dt)
 
+    -- for every pipe in the pipes table
+    for k, pair in pairs(pipe_pairs) do
+        pair:update(dt)
+
+        -- remove pipes that go off screen
+        if pair.x < 0 then
+            table.remove(pipe_pairs, k)
+        end
+    end
+
+    -- clear input table
     love.keyboard.keysPressed = {}
 end
 
@@ -68,12 +96,16 @@ function love.draw()
     push:start()
     love.graphics.draw(background, 0, 0)
 
-    love.graphics.draw(back_clouds, -back_clouds_scroll, 0)
-    love.graphics.draw(middle_clouds, -middle_clouds_scroll, 0)
+    love.graphics.draw(back_clouds, math.floor(-back_clouds_scroll - 0.5), 0)
+    love.graphics.draw(middle_clouds, math.floor(-middle_clouds_scroll - 0.5), 0)
 
     bird:render()
 
-    love.graphics.draw(front_clouds, -front_clouds_scroll, 0)
+    for k, pair in pairs(pipe_pairs) do
+        pair:render()
+    end
+
+    love.graphics.draw(front_clouds, math.floor(-front_clouds_scroll + 0.5), 0)
 
     push:finish()
 end

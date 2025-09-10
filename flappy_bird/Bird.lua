@@ -14,7 +14,7 @@ function Bird:init()
 end
 
 function Bird:render()
-    love.graphics.draw(self.image, self.x, self.y)
+    love.graphics.draw(self.image, math.floor(self.x), math.floor(self.y + 0.5))
 end
 
 function Bird:update(dt)
