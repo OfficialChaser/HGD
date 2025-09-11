@@ -1,30 +1,33 @@
 PipePair = Class{}
 
-local GAP_HEIGHT = 70
-local PIPE_SCROLL = -60
+local GAP_HEIGHT = 30
 
 function PipePair:init(y)
-    self.x = VIRTUAL_WIDTH
+    self.x = VIRTUAL_WIDTH + 32
     self.y = y
 
+    -- TODO: finish implementing constructor
     self.pipes = {
-        ['top'] = Pipe(self.y),
-        ['bottom'] = Pipe(self.y + PIPE_HEIGHT + GAP_HEIGHT)
+        ['upper'] = Pipe('top', self.y - PIPE_HEIGHT),
+        ['lower'] = Pipe('bottom', self.y + PIPE_HEIGHT + GAP_HEIGHT)
     }
+
+    self.remove = false
+    self.scored = false
+end
+
+function PipePair:update(dt)
+    if self.x > -PIPE_WIDTH then
+        self.x = self.x - PIPE_SPEED * dt
+        self.pipes['lower'].x = self.x
+        self.pipes['upper'].x = self.x
+    else
+        self.remove = true
+    end
 end
 
 function PipePair:render()
     for k, pipe in pairs(self.pipes) do
         pipe:render()
     end
-end
-
-function PipePair:update(dt)
-    for k, pipe in pairs(self.pipes) do
-        pipe.x = pipe.x + PIPE_SCROLL * dt
-    end
-end
-
-function PipePair:offscreen()
-    return self.x < -PIPE_WIDTH
 end

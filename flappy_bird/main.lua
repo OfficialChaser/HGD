@@ -1,5 +1,13 @@
 push = require 'lib/push'
+
 Class = require 'lib/class'
+
+require 'StateMachine'
+require 'states/BaseState'
+require 'states/CountdownState'
+require 'states/PlayState'
+require 'states/ScoreState'
+require 'states/TitleScreenState'
 
 require 'Bird'
 require 'Pipe'
@@ -25,17 +33,35 @@ local back_clouds = love.graphics.newImage('graphics/back_clouds.png')
 local middle_clouds = love.graphics.newImage('graphics/middle_clouds.png')
 local front_clouds = love.graphics.newImage('graphics/front_clouds.png')
 
-local bird = Bird()
+local background = love.graphics.newImage('graphics/background.png')
 
-local pipe_pairs = {}
-local pipe_spawn_timer = 0
-local last_pipe_y = -PIPE_HEIGHT + math.random(80) + 20
-
+-- global variable we can use to scroll the map
+scrolling = true
 
 function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
+    
+    math.randomseed(os.time())
 
     love.window.setTitle('Domestic Pigeon 3.0')
+    smallFont = love.graphics.newFont('fonts/font.ttf', 8)
+    mediumFont = love.graphics.newFont('fonts/flappy.ttf', 14)
+    flappyFont = love.graphics.newFont('fonts/flappy.ttf', 28)
+    hugeFont = love.graphics.newFont('fonts/flappy.ttf', 56)
+    love.graphics.setFont(flappyFont)
+
+    sounds = {
+        ['jump'] = love.audio.newSource('sounds/jump.wav', 'static'),
+        ['explosion'] = love.audio.newSource('sounds/explosion.wav', 'static'),
+        ['hurt'] = love.audio.newSource('sounds/hurt.wav', 'static'),
+        ['score'] = love.audio.newSource('sounds/score.wav', 'static'),
+
+        -- https://freesound.org/people/xsgianni/sounds/388079/
+        ['music'] = love.audio.newSource('sounds/marios_way.mp3', 'static')
+    }
+
+    sounds['music']:setLooping(true)
+    sounds['music']:play()
 
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         vsync = true,
@@ -43,69 +69,69 @@ function love.load()
         resizable = true
     })
 
+    -- initialize state machine with all state-returning functions
+    gStateMachine = StateMachine {
+        ['title'] = function() return TitleScreenState() end,
+        ['countdown'] = function() return CountdownState() end,
+        ['play'] = function() return PlayState() end,
+        ['score'] = function() return ScoreState() end
+    }
+    gStateMachine:change('title')
+
+    -- initialize input table
     love.keyboard.keysPressed = {}
+
+    -- initialize mouse input table
+    love.mouse.buttonsPressed = {}
 end
 
 function love.resize(w, h)
     push:resize(w, h)
 end
 
-function love.keyboard.wasPressed(key)
-    return love.keyboard.keysPressed[key]
-end
-
 function love.keypressed(key)
     love.keyboard.keysPressed[key] = true
+
     if key == 'escape' then
         love.event.quit()
     end
 end
 
+function love.mousepressed(x, y, button)
+    love.mouse.buttonsPressed[button] = true
+end
+
+function love.keyboard.wasPressed(key)
+    return love.keyboard.keysPressed[key]
+end
+
+function love.mouse.wasPressed(button)
+    return love.mouse.buttonsPressed[button]
+end
+
 function love.update(dt)
-
-    pipe_spawn_timer = pipe_spawn_timer + dt
-    if pipe_spawn_timer > 2 then
-        local y = math.max(-PIPE_HEIGHT + 10, 
-            math.min(last_pipe_y + math.random(-20, 20), VIRTUAL_HEIGHT - 90 - PIPE_HEIGHT))
-        last_pipe_y = y
-        table.insert(pipe_pairs, PipePair(y))
-        pipe_spawn_timer = 0
+    if scrolling then
+        back_clouds_scroll = (back_clouds_scroll + BACK_CLOUDS_SCROLL_SPEED * dt) % (back_clouds:getWidth() / 2)
+        middle_clouds_scroll = (middle_clouds_scroll + MIDDLE_CLOUDS_SCROLL_SPEED * dt) % (middle_clouds:getWidth() / 2)
+        front_clouds_scroll = (front_clouds_scroll + FRONT_CLOUDS_SCROLL_SPEED * dt) % (front_clouds:getWidth() / 2)
     end
 
-    back_clouds_scroll = (back_clouds_scroll + BACK_CLOUDS_SCROLL_SPEED * dt) % (back_clouds:getWidth() / 2)
-    middle_clouds_scroll = (middle_clouds_scroll + MIDDLE_CLOUDS_SCROLL_SPEED * dt) % (middle_clouds:getWidth() / 2)
-    front_clouds_scroll = (front_clouds_scroll + FRONT_CLOUDS_SCROLL_SPEED * dt) % (front_clouds:getWidth() / 2)
+    gStateMachine:update(dt)
 
-    bird:update(dt)
-
-    -- for every pipe in the pipes table
-    for k, pair in pairs(pipe_pairs) do
-        pair:update(dt)
-
-        -- remove pipes that go off screen
-        if pair.x < 0 then
-            table.remove(pipe_pairs, k)
-        end
-    end
-
-    -- clear input table
     love.keyboard.keysPressed = {}
+    love.mouse.buttonsPressed = {}
 end
 
 function love.draw()
     push:start()
-    love.graphics.draw(background, 0, 0)
 
+    love.graphics.draw(background, 0, 0)
+    
     love.graphics.draw(back_clouds, math.floor(-back_clouds_scroll - 0.5), 0)
     love.graphics.draw(middle_clouds, math.floor(-middle_clouds_scroll - 0.5), 0)
-
-    bird:render()
-
-    for k, pair in pairs(pipe_pairs) do
-        pair:render()
-    end
-
+    gStateMachine:render()
+    love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(front_clouds, math.floor(-front_clouds_scroll + 0.5), 0)
-
+    
     push:finish()
 end
