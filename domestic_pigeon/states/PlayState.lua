@@ -1,12 +1,12 @@
 PlayState = Class{__includes = BaseState}
 
 PIPE_SPEED = 60
-PIPE_WIDTH = 70
-PIPE_HEIGHT = 288
-GAP_HEIGHT = 90
+PIPE_WIDTH = 28
+PIPE_HEIGHT = 72
+GAP_HEIGHT = 56
 
-BIRD_WIDTH = 38
-BIRD_HEIGHT = 24
+BIRD_WIDTH = 25
+BIRD_HEIGHT = 20
 
 SPAWN_INTERVAL = 2
 
@@ -24,11 +24,9 @@ function PlayState:update(dt)
     self.timer = self.timer + dt
 
     if self.timer > SPAWN_INTERVAL then
-        -- modify the last Y coordinate we placed so pipe gaps aren't too far apart
-        -- no higher than 10 pixels below the top edge of the screen,
-        -- and no lower than a gap length (90 pixels) from the bottom
+        -- TODO: fix this
         local y = math.max(-PIPE_HEIGHT + 10, 
-            math.min(self.lastY + math.random(-20, 20), VIRTUAL_HEIGHT - GAP_HEIGHT - PIPE_HEIGHT))
+            math.min(self.lastY + math.random(-60, 60), VIRTUAL_HEIGHT - GAP_HEIGHT - PIPE_HEIGHT - 16))
         self.lastY = y
 
         -- add a new pipe pair at the end of the screen at our new Y
@@ -43,9 +41,8 @@ function PlayState:update(dt)
         -- score a point if the pipe has gone past the bird to the left all the way
         -- be sure to ignore it if it's already been scored
         if not pair.scored then
-            if pair.x + PIPE_WIDTH < self.bird.x then
-
-                -- TODO: add scoring logic 
+            if pair.x + PIPE_WIDTH / 2 < self.bird.x then
+ 
                 pair.scored = true
                 self.score = self.score + 1
                 sounds['score']:play()
@@ -99,10 +96,9 @@ function PlayState:render()
     for k, pair in pairs(self.pipePairs) do
         pair:render()
     end
-
-    love.graphics.setFont(flappyFont)
-    love.graphics.print('Score: ' .. tostring(self.score), 8, 8)
-
+    love.graphics.setFont(mediumFont)
+    love.graphics.setColor(236/255, 233/255, 16/255, 1)
+    love.graphics.print(tostring(self.score), self.bird.x + self.bird.width / 2 - mediumFont:getWidth(tostring(self.score)) / 2 + 1, self.bird.y - 16)
     self.bird:render()
 end
 

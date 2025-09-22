@@ -18,19 +18,21 @@ WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
 -- virtual resolution dimensions
-VIRTUAL_WIDTH = 512
-VIRTUAL_HEIGHT = 288
+VIRTUAL_WIDTH = 256
+VIRTUAL_HEIGHT = 144
 
 local background = love.graphics.newImage('graphics/background.png')
-local backgroundScroll = 0
+local back_clouds = love.graphics.newImage('graphics/back_clouds.png')
+local middle_clouds = love.graphics.newImage('graphics/middle_clouds.png')
+local front_clouds = love.graphics.newImage('graphics/front_clouds.png')
 
-local ground = love.graphics.newImage('graphics/ground.png')
-local groundScroll = 0
+local back_clouds_scroll = 0
+local middle_clouds_scroll = 0
+local front_clouds_scroll = 0
 
-local BACKGROUND_SCROLL_SPEED = 30
-local GROUND_SCROLL_SPEED = 60
-
-local BACKGROUND_LOOPING_POINT = 413
+local BACK_CLOUDS_SCROLL_SPEED = 30
+local MIDDLE_CLOUDS_SCROLL_SPEED = 70
+local FRONT_CLOUDS_SCROLL_SPEED = 90
 
 -- global variable we can use to scroll the map
 scrolling = true
@@ -52,8 +54,6 @@ function love.load()
         ['explosion'] = love.audio.newSource('sounds/explosion.wav', 'static'),
         ['hurt'] = love.audio.newSource('sounds/hurt.wav', 'static'),
         ['score'] = love.audio.newSource('sounds/score.wav', 'static'),
-
-        -- https://freesound.org/people/xsgianni/sounds/388079/
         ['music'] = love.audio.newSource('sounds/marios_way.mp3', 'static')
     }
 
@@ -108,8 +108,9 @@ end
 
 function love.update(dt)
     if scrolling then
-        backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
-        groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
+        back_clouds_scroll = (back_clouds_scroll + BACK_CLOUDS_SCROLL_SPEED * dt) % (back_clouds:getWidth() / 2)
+        middle_clouds_scroll = (middle_clouds_scroll + MIDDLE_CLOUDS_SCROLL_SPEED * dt) % (middle_clouds:getWidth() / 2)
+        front_clouds_scroll = (front_clouds_scroll + FRONT_CLOUDS_SCROLL_SPEED * dt) % (front_clouds:getWidth() / 2)
     end
 
     gStateMachine:update(dt)
@@ -120,10 +121,14 @@ end
 
 function love.draw()
     push:start()
+
+    love.graphics.draw(background, 0, 0)
     
-    love.graphics.draw(background, -backgroundScroll, 0)
+    love.graphics.draw(back_clouds, math.floor(-back_clouds_scroll - 0.5), 0)
+    love.graphics.draw(middle_clouds, math.floor(-middle_clouds_scroll - 0.5), 0)
     gStateMachine:render()
-    love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - 16)
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.draw(front_clouds, math.floor(-front_clouds_scroll + 0.5), 0)
     
     push:finish()
 end

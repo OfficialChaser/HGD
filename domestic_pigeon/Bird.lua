@@ -32,7 +32,7 @@ function Bird:update(dt)
 
     -- TODO: add mouse functionality
     if love.keyboard.wasPressed('space') then 
-        self.dy = -1
+        self.dy = -2
         sounds['jump']:play()
     end
 
@@ -40,7 +40,9 @@ function Bird:update(dt)
 end
 
 function Bird:render()
+    love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(self.image, self.x, self.y)
 
-    -- TODO: add debug option for printing hitbox
+    --love.graphics.setColor(1, 0, 0, 1)
+    --love.graphics.rectangle('line', self.x + 2, self.y + 2, self.width - 4, self.height - 4)
 end
