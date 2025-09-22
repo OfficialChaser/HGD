@@ -70,7 +70,6 @@ function PlayState:update(dt)
                 sounds['explosion']:play()
                 sounds['hurt']:play()
 
-                -- TODO: what state do we change to here and how?
                 gStateMachine:change('score', {
                     score = self.score
                 })
@@ -89,6 +88,11 @@ function PlayState:update(dt)
         gStateMachine:change('score', {
             score = self.score
         })
+    end
+
+    if love.keyboard.wasPressed('return') or love.keyboard.wasPressed('enter') then
+        print("PAUSED")
+        gStateMachine:change('pause')
     end
 end
 
