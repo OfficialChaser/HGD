@@ -18,8 +18,11 @@ function Bird:collides(pipe)
     -- the 4's are right and bottom offsets
     -- both offsets are used to shrink the bounding box to give the player
     -- a little bit of leeway with the collision
-    if (self.x + 2) + (self.width - 4) >= pipe.x and self.x + 2 <= pipe.x + PIPE_WIDTH then
-        if (self.y + 2) + (self.height - 4) >= pipe.y and self.y + 2 <= pipe.y + PIPE_HEIGHT then
+    -- Make the hitbox more forgiving by increasing the offset and reducing the hitbox size
+    local hitboxOffset = 5
+    local hitboxShrink = 10
+    if (self.x + hitboxOffset) + (self.width - hitboxShrink) >= pipe.x and self.x + hitboxOffset <= pipe.x + PIPE_WIDTH then
+        if (self.y + hitboxOffset) + (self.height - hitboxShrink) >= pipe.y and self.y + hitboxOffset <= pipe.y + PIPE_HEIGHT then
             return true
         end
     end

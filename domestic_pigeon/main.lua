@@ -43,7 +43,7 @@ function love.load()
     
     math.randomseed(os.time())
 
-    love.window.setTitle('Fifty Bird')
+    love.window.setTitle('Domestic Pigeon')
     smallFont = love.graphics.newFont('fonts/font.ttf', 8)
     mediumFont = love.graphics.newFont('fonts/flappy.ttf', 14)
     flappyFont = love.graphics.newFont('fonts/flappy.ttf', 28)
@@ -72,7 +72,8 @@ function love.load()
         ['title'] = function() return TitleScreenState() end,
         ['countdown'] = function() return CountdownState() end,
         ['play'] = function() return PlayState() end,
-        ['score'] = function() return ScoreState() end
+        ['score'] = function() return ScoreState() end,
+        ['pause'] = function() return PauseState() end
     }
     gStateMachine:change('title')
 
@@ -125,11 +126,13 @@ function love.draw()
 
     love.graphics.draw(background, 0, 0)
     
-    love.graphics.draw(back_clouds, math.floor(-back_clouds_scroll - 0.5), 0)
-    love.graphics.draw(middle_clouds, math.floor(-middle_clouds_scroll - 0.5), 0)
-    gStateMachine:render()
+    love.graphics.draw(back_clouds, math.floor(-back_clouds_scroll - 0.99), 0)
+    love.graphics.draw(middle_clouds, math.floor(-middle_clouds_scroll - 0.99), 0)
+    
     love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.draw(front_clouds, math.floor(-front_clouds_scroll + 0.5), 0)
+    love.graphics.draw(front_clouds, math.floor(-front_clouds_scroll + 0.99), 0)
+
+    gStateMachine:render()
     
     push:finish()
 end

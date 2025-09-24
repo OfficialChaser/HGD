@@ -1,6 +1,6 @@
 PlayState = Class{__includes = BaseState}
 
-PIPE_SPEED = 60
+PIPE_SPEED = 90
 PIPE_WIDTH = 28
 PIPE_HEIGHT = 72
 GAP_HEIGHT = 56
@@ -8,7 +8,7 @@ GAP_HEIGHT = 56
 BIRD_WIDTH = 25
 BIRD_HEIGHT = 20
 
-SPAWN_INTERVAL = 2
+SPAWN_INTERVAL = 1
 
 function PlayState:init()
     self.bird = Bird()
@@ -24,9 +24,10 @@ function PlayState:update(dt)
     self.timer = self.timer + dt
 
     if self.timer > SPAWN_INTERVAL then
-        -- TODO: fix this
+        local gap = math.random(math.max(56 - self.score, 38), math.max(80 - self.score, 54))
+        GAP_HEIGHT = gap - (gap % 2)
         local y = math.max(-PIPE_HEIGHT + 10, 
-            math.min(self.lastY + math.random(-60, 60), VIRTUAL_HEIGHT - GAP_HEIGHT - PIPE_HEIGHT - 16))
+            math.min(self.lastY + math.random(-16, 16), VIRTUAL_HEIGHT - GAP_HEIGHT - PIPE_HEIGHT - 16))
         self.lastY = y
 
         -- add a new pipe pair at the end of the screen at our new Y
@@ -81,7 +82,7 @@ function PlayState:update(dt)
     self.bird:update(dt)
 
     -- reset if we get to the ground
-    if self.bird.y > VIRTUAL_HEIGHT - 15 then
+    if self.bird.y > VIRTUAL_HEIGHT - 15 or self.bird.y < -15 then
         sounds['explosion']:play()
         sounds['hurt']:play()
 
@@ -90,9 +91,14 @@ function PlayState:update(dt)
         })
     end
 
-    if love.keyboard.wasPressed('return') or love.keyboard.wasPressed('enter') then
-        print("PAUSED")
-        gStateMachine:change('pause')
+    if love.keyboard.wasPressed('p') then
+        gStateMachine:change('pause', {
+            bird = self.bird,
+            pipePairs = self.pipePairs,
+            score = self.score,
+            timer = self.timer,
+            lastY = self.lastY
+        })
     end
 end
 
@@ -106,9 +112,16 @@ function PlayState:render()
     self.bird:render()
 end
 
-function PlayState:enter()
+function PlayState:enter(params)
     -- if we're coming from death, restart scrolling
     scrolling = true
+    if params then
+        self.bird = params.bird
+        self.pipePairs = params.pipePairs
+        self.score = params.score
+        self.timer = params.timer
+        self.lastY = params.lastY
+    end
 end
 
 function PlayState:exit()

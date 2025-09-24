@@ -17,7 +17,7 @@ function Pipe:update(dt)
 end
 
 function Pipe:render()
-    love.graphics.draw(PIPE_IMAGE, self.x,
+    love.graphics.draw(PIPE_IMAGE, math.floor(self.x - 0.9),
         (self.orientation == 'top' and self.y + PIPE_HEIGHT or self.y),
         0, 1, self.orientation == 'top' and -1 or 1
     )
