@@ -63,6 +63,10 @@ function love.load()
         frames = {3},
         interval = 1
     }
+    emoteAnimation = Animation {
+        frames = {5, 7, 9},
+        interval = 0.3
+    }
 
     currentAnimation = idleAnimation
 
@@ -154,6 +158,8 @@ function love.update(dt)
         end
 
         direction = 'right'
+    elseif love.keyboard.isDown('e') then
+        currentAnimation = emoteAnimation
     else
         currentAnimation = idleAnimation
     end

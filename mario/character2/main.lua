@@ -35,6 +35,8 @@ GROUND = 1
 function love.load()
     math.randomseed(os.time())
 
+    love.graphics.setDefaultFilter('nearest', 'nearest')
+
     tiles = {}
     
     -- tilesheet image and quads for it, which will map to our IDs
@@ -70,8 +72,8 @@ function love.load()
         end
     end
 
-    love.graphics.setDefaultFilter('nearest', 'nearest')
-    love.window.setTitle('tiles0')
+    
+    love.window.setTitle('character2')
 
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         fullscreen = false,
