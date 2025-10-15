@@ -15,6 +15,8 @@ function LevelMaker.generate(width, height)
     local entities = {}
     local objects = {}
 
+    local in_chasm = false
+
     local tileID = TILE_ID_GROUND
     
     -- whether we should draw our tiles with toppers
@@ -38,7 +40,8 @@ function LevelMaker.generate(width, height)
         end
 
         -- chance to just be emptiness
-        if math.random(7) == 1 and x ~= 1 then
+        if math.random(7) == 1 and x ~= 1 or in_chasm then
+            in_chasm = true
             for y = 7, height do
                 table.insert(tiles[y],
                     Tile(x, y, tileID, nil, tileset, topperset))

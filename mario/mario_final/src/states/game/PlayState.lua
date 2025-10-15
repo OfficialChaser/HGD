@@ -17,6 +17,8 @@ function PlayState:init()
 
     self.gravityOn = true
     self.gravityAmount = 6
+    -- debug: show collision shapes
+    self.showCollision = false
 
     self.player = Player({
         x = 0, y = 0,
@@ -54,6 +56,11 @@ function PlayState:update(dt)
     elseif self.player.x > TILE_SIZE * self.tileMap.width - self.player.width then
         self.player.x = TILE_SIZE * self.tileMap.width - self.player.width
     end
+
+    -- toggle collision debug drawing
+    if love.keyboard.wasPressed('c') then
+        self.showCollision = not self.showCollision
+    end
 end
 
 function PlayState:render()
@@ -71,6 +78,37 @@ function PlayState:render()
     self.level:render()
 
     self.player:render()
+    -- draw collision shapes if enabled
+    if self.showCollision then
+        -- draw tile collision boxes (collidable tiles)
+        love.graphics.setColor(1, 0, 0, 0.5)
+        for y = 1, self.tileMap.height do
+            for x = 1, self.tileMap.width do
+                local tile = self.tileMap.tiles[y][x]
+                if tile and tile:collidable() then
+                    love.graphics.rectangle('fill', (tile.x - 1) * TILE_SIZE, (tile.y - 1) * TILE_SIZE, tile.width, tile.height)
+                end
+            end
+        end
+
+        -- draw objects (all objects bounding boxes)
+        love.graphics.setColor(0, 0, 1, 0.5)
+        for k, object in pairs(self.level.objects) do
+            love.graphics.rectangle('fill', object.x, object.y, object.width, object.height)
+        end
+
+        -- draw entities (including player)
+        love.graphics.setColor(0, 1, 0, 0.5)
+        for k, entity in pairs(self.level.entities) do
+            love.graphics.rectangle('fill', entity.x, entity.y, entity.width, entity.height)
+        end
+
+        -- player box (distinct color)
+        love.graphics.setColor(1, 1, 0, 0.6)
+        love.graphics.rectangle('fill', self.player.x, self.player.y, self.player.width, self.player.height)
+
+        love.graphics.setColor(1, 1, 1, 1)
+    end
     love.graphics.pop()
     
     -- render score
