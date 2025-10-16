@@ -16,6 +16,8 @@ function LevelMaker.generate(width, height)
     local objects = {}
 
     local in_chasm = false
+    local chasm_counter = 0
+    local just_finished_chasm = false
 
     local tileID = TILE_ID_GROUND
     
@@ -40,13 +42,22 @@ function LevelMaker.generate(width, height)
         end
 
         -- chance to just be emptiness
-        if math.random(7) == 1 and x ~= 1 or in_chasm then
-            in_chasm = true
+        if (x ~= width) and ((math.random(7) == 1 and x ~= 1) or (in_chasm and not just_finished_chasm)) then
+            if not in_chasm then
+                in_chasm = true
+                chasm_counter = math.random(2, 3)
+            end
+            chasm_counter = chasm_counter - 1
+            if chasm_counter == 0 then
+                in_chasm = false
+                just_finished_chasm = true
+            end
             for y = 7, height do
                 table.insert(tiles[y],
                     Tile(x, y, tileID, nil, tileset, topperset))
             end
         else
+            just_finished_chasm = false
             tileID = TILE_ID_GROUND
 
             -- height at which we would spawn a potential jump block
@@ -163,9 +174,12 @@ function LevelMaker.generate(width, height)
             end
         end
     end
+    
 
     local map = TileMap(width, height)
     map.tiles = tiles
     
+
+
     return GameLevel(entities, objects, map)
 end

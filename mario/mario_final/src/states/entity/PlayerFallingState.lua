@@ -34,7 +34,7 @@ function PlayerFallingState:update(dt)
         self.player.dy = 0
         
         -- set the player to be walking or idle on landing depending on input
-        if love.keyboard.isDown('left') or love.keyboard.isDown('right') then
+        if love.keyboard.isDown('a') or love.keyboard.isDown('d') then
             self.player:changeState('walking')
         else
             self.player:changeState('idle')
@@ -48,11 +48,11 @@ function PlayerFallingState:update(dt)
         gStateMachine:change('start')
     
     -- check side collisions and reset position
-    elseif love.keyboard.isDown('left') then
+    elseif love.keyboard.isDown('a') then
         self.player.direction = 'left'
         self.player.x = self.player.x - PLAYER_WALK_SPEED * dt
         self.player:checkLeftCollisions(dt)
-    elseif love.keyboard.isDown('right') then
+    elseif love.keyboard.isDown('d') then
         self.player.direction = 'right'
         self.player.x = self.player.x + PLAYER_WALK_SPEED * dt
         self.player:checkRightCollisions(dt)
