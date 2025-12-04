@@ -73,7 +73,7 @@ gTextures = {
     ['jump-blocks'] = love.graphics.newImage('graphics/jump_blocks.png'),
     ['gems'] = love.graphics.newImage('graphics/gems.png'),
     ['backgrounds'] = love.graphics.newImage('graphics/backgrounds.png'),
-    ['green-alien'] = love.graphics.newImage('graphics/green_alien.png'),
+    ['green-alien'] = love.graphics.newImage('graphics/pink_alien.png'),
     ['creatures'] = love.graphics.newImage('graphics/creatures.png'),
     ['flags'] = love.graphics.newImage('graphics/flags.png'),
 }
@@ -93,7 +93,6 @@ gFrames = {
     ['flag_toppers'] = GenerateQuads(gTextures['flags'], 16, 16)
 }
 
-print(#gFrames['flags'])
 -- these need to be added after gFrames is initialized because they refer to gFrames from within
 gFrames['tilesets'] = GenerateTileSets(gFrames['tiles'], 
     TILE_SETS_WIDE, TILE_SETS_TALL, TILE_SET_WIDTH, TILE_SET_HEIGHT)

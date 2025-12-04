@@ -175,7 +175,7 @@ function LevelMaker.generate(width, height)
             -- add a flag at the end of the level
         local flag = Flag {
             texture = 'flags',   -- must exist in your textures table
-            x = (width - 1) * TILE_SIZE,
+            x = (width - 2) * TILE_SIZE,
             y = (7 - 1) * TILE_SIZE - 48, 
             width = 16,
             height = 48,
