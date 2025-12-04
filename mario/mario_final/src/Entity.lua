@@ -33,6 +33,7 @@ function Entity:init(def)
 
     -- reference to level for tests against other entities + objects
     self.level = def.level
+
 end
 
 function Entity:changeState(state, params)
@@ -40,7 +41,9 @@ function Entity:changeState(state, params)
 end
 
 function Entity:update(dt)
-    self.stateMachine:update(dt)
+    if self.stateMachine then
+        self.stateMachine:update(dt)
+    end
 end
 
 function Entity:collides(entity)
@@ -49,6 +52,31 @@ function Entity:collides(entity)
 end
 
 function Entity:render()
-    love.graphics.draw(gTextures[self.texture], gFrames[self.texture][self.currentAnimation:getCurrentFrame()],
+    -- determine quad to draw with safe fallbacks
+    local quad = nil
+    local framesForTexture = gFrames[self.texture]
+
+    if self.currentAnimation and type(self.currentAnimation.getCurrentFrame) == 'function' then
+        local frameIndex = self.currentAnimation:getCurrentFrame()
+        if framesForTexture then quad = framesForTexture[frameIndex] end
+    end
+
+    -- fallback to entity's frame property (if present)
+    if not quad and self.frame and framesForTexture then
+        quad = framesForTexture[self.frame]
+    end
+
+    -- final fallback to first frame
+    if not quad and framesForTexture then
+        quad = framesForTexture[1]
+    end
+
+    -- if we still don't have a quad, bail out to avoid crashing
+    if not quad then
+        print("Warning: missing quad for texture '" .. tostring(self.texture) .. "' in Entity:render()")
+        return
+    end
+
+    love.graphics.draw(gTextures[self.texture], quad,
         math.floor(self.x) + 8, math.floor(self.y) + 10, 0, self.direction == 'right' and 1 or -1, 1, 8, 10)
 end

@@ -52,6 +52,7 @@ require 'src/Player'
 require 'src/Snail'
 require 'src/Tile'
 require 'src/TileMap'
+require 'src/Flag'
 
 
 gSounds = {
@@ -73,8 +74,8 @@ gTextures = {
     ['gems'] = love.graphics.newImage('graphics/gems.png'),
     ['backgrounds'] = love.graphics.newImage('graphics/backgrounds.png'),
     ['green-alien'] = love.graphics.newImage('graphics/green_alien.png'),
-    ['creatures'] = love.graphics.newImage('graphics/creatures.png')
-    ,['flags'] = love.graphics.newImage('graphics/flags.png')
+    ['creatures'] = love.graphics.newImage('graphics/creatures.png'),
+    ['flags'] = love.graphics.newImage('graphics/flags.png'),
 }
 
 gFrames = {
@@ -87,10 +88,12 @@ gFrames = {
     ['gems'] = GenerateQuads(gTextures['gems'], 16, 16),
     ['backgrounds'] = GenerateQuads(gTextures['backgrounds'], 256, 128),
     ['green-alien'] = GenerateQuads(gTextures['green-alien'], 16, 20),
-    ['creatures'] = GenerateQuads(gTextures['creatures'], 16, 16)
-    ,['flags'] = GenerateQuads(gTextures['flags'], 16, 16)
+    ['creatures'] = GenerateQuads(gTextures['creatures'], 16, 16),
+    ['flags'] = GenerateQuads(gTextures['flags'], 16, 48),
+    ['flag_toppers'] = GenerateQuads(gTextures['flags'], 16, 16)
 }
 
+print(#gFrames['flags'])
 -- these need to be added after gFrames is initialized because they refer to gFrames from within
 gFrames['tilesets'] = GenerateTileSets(gFrames['tiles'], 
     TILE_SETS_WIDE, TILE_SETS_TALL, TILE_SET_WIDTH, TILE_SET_HEIGHT)

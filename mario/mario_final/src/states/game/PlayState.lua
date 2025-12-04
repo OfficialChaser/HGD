@@ -12,7 +12,7 @@ function PlayState:init()
     self.camY = 0
     self.level = LevelMaker.generate(100, 10)
     self.tileMap = self.level.tileMap
-    self.background = math.random(3)
+    self.background = math.random(2, 3)
     self.backgroundX = 0
 
     self.gravityOn = true

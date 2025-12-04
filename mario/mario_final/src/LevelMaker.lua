@@ -42,7 +42,7 @@ function LevelMaker.generate(width, height)
         end
 
         -- chance to just be emptiness
-        if (x ~= width) and ((math.random(7) == 1 and x ~= 1) or (in_chasm and not just_finished_chasm)) then
+        if (x < width - 2) and ((math.random(7) == 1 and x ~= 1) or (in_chasm and not just_finished_chasm)) then
             if not in_chasm then
                 in_chasm = true
                 chasm_counter = math.random(2, 3)
@@ -69,7 +69,7 @@ function LevelMaker.generate(width, height)
             end
 
             -- chance to generate a pillar
-            if math.random(8) == 1 then
+            if math.random(8) == 1 and (x < width - 2) then
                 blockHeight = 2
                 
                 -- chance to generate bush on pillar
@@ -95,7 +95,7 @@ function LevelMaker.generate(width, height)
                 tiles[7][x].topper = nil
             
             -- chance to generate bushes
-            elseif math.random(8) == 1 then
+            elseif math.random(8) == 1 and (x < width - 2) then
                 table.insert(objects,
                     GameObject {
                         texture = 'bushes',
@@ -110,7 +110,7 @@ function LevelMaker.generate(width, height)
             end
 
             -- chance to spawn a block
-            if math.random(10) == 1 then
+            if math.random(10) == 1 and (x < width - 2) then
                 table.insert(objects,
 
                     -- jump block
@@ -172,6 +172,19 @@ function LevelMaker.generate(width, height)
                     }
                 )
             end
+            -- add a flag at the end of the level
+        local flag = Flag {
+            texture = 'flags',   -- must exist in your textures table
+            x = (width - 1) * TILE_SIZE,
+            y = (7 - 1) * TILE_SIZE - 48, 
+            width = 16,
+            height = 48,
+            collidable = true,
+            solid = false,
+            hit = false
+        }
+
+        table.insert(objects, flag)
         end
     end
     
