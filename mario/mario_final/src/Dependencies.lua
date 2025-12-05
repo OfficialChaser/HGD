@@ -53,6 +53,7 @@ require 'src/Snail'
 require 'src/Tile'
 require 'src/TileMap'
 require 'src/Flag'
+require 'src/AcidRain'
 
 
 gSounds = {
@@ -76,6 +77,7 @@ gTextures = {
     ['green-alien'] = love.graphics.newImage('graphics/pink_alien.png'),
     ['creatures'] = love.graphics.newImage('graphics/creatures.png'),
     ['flags'] = love.graphics.newImage('graphics/flags.png'),
+    ['acid'] = love.graphics.newImage('graphics/acid_rain.png')
 }
 
 gFrames = {
@@ -90,7 +92,8 @@ gFrames = {
     ['green-alien'] = GenerateQuads(gTextures['green-alien'], 16, 20),
     ['creatures'] = GenerateQuads(gTextures['creatures'], 16, 16),
     ['flags'] = GenerateQuads(gTextures['flags'], 16, 48),
-    ['flag_toppers'] = GenerateQuads(gTextures['flags'], 16, 16)
+    ['flag_toppers'] = GenerateQuads(gTextures['flags'], 16, 16),
+    ['acid'] = GenerateQuads(gTextures['acid'], 1, 4)
 }
 
 -- these need to be added after gFrames is initialized because they refer to gFrames from within

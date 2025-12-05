@@ -36,6 +36,18 @@ function PlayState:init()
 
     self:spawnEnemies()
 
+    self.acidRains = {}
+    for i = 1, 100 do
+        local acidRain = AcidRain({
+            x = math.random(0, VIRTUAL_WIDTH - 16),
+            y = math.random(-VIRTUAL_HEIGHT, 0),
+            width = 1,
+            height = 4,
+            texture = 'acid',
+        }, math.random(30, 60))
+        table.insert(self.acidRains, acidRain)
+    end
+
     self.player:changeState('falling')
 end
 
@@ -61,6 +73,11 @@ function PlayState:update(dt)
     if love.keyboard.wasPressed('c') then
         self.showCollision = not self.showCollision
     end
+
+    for k, acidRain in pairs(self.acidRains) do
+        acidRain:update(dt)
+        acidRain:render()
+    end
 end
 
 function PlayState:render()
@@ -78,6 +95,10 @@ function PlayState:render()
     self.level:render()
 
     self.player:render()
+
+    for k, acidRain in pairs(self.acidRains) do
+       acidRain:render()
+    end
     -- draw collision shapes if enabled
     if self.showCollision then
         -- draw tile collision boxes (collidable tiles)
@@ -108,6 +129,7 @@ function PlayState:render()
         love.graphics.rectangle('fill', self.player.x, self.player.y, self.player.width, self.player.height)
 
         love.graphics.setColor(1, 1, 1, 1)
+        
     end
     love.graphics.pop()
     
