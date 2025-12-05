@@ -24,7 +24,7 @@ require 'src/Dependencies'
 
 function love.load()
     love.graphics.setFont(gFonts['medium'])
-    love.window.setTitle('Super 50 Bros.')
+    love.window.setTitle('Acid Rain')
 
     math.randomseed(os.time())
     
@@ -40,6 +40,9 @@ function love.load()
         ['play'] = function() return PlayState() end
     }
     gStateMachine:change('start')
+
+    day = 1
+    score = 0
 
     gSounds['music']:setLooping(true)
     gSounds['music']:setVolume(0.5)

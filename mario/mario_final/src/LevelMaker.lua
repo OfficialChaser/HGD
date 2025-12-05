@@ -42,7 +42,7 @@ function LevelMaker.generate(width, height)
         end
 
         -- chance to just be emptiness
-        if (x < width - 2) and ((math.random(7) == 1 and x ~= 1) or (in_chasm and not just_finished_chasm)) then
+        if  (x < width - 2) and ((math.random(7) == 1 and x > 3) or (in_chasm and not just_finished_chasm)) then
             if not in_chasm then
                 in_chasm = true
                 chasm_counter = math.random(2, 3)
@@ -151,7 +151,7 @@ function LevelMaker.generate(width, height)
                                         -- gem has its own function to add to the player's score
                                         onConsume = function(player, object)
                                             gSounds['pickup']:play()
-                                            player.score = player.score + 100
+                                            score = score + 100
                                         end
                                     }
                                     

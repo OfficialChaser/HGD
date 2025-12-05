@@ -43,16 +43,14 @@ end
 
 
 function Flag:collides(target)
-    return Entity.collides(self, target)
+    local result = Entity.collides(self, target)
+    
+    if result and target == gStateMachine.current.player then
+        self:onCollide(target)
+    end
 end
 
 function Flag:onCollide(target)
-    if target == gStateMachine.current.player and not self.hit then
-        gSounds['flagpole']:play()
-        self.hit = true
-        gStateMachine:change('play', {
-            score = target.score + 1000,
-            level = gStateMachine.current.level + 1
-        })
-    end
+    day = day + 1
+    gStateMachine:change('play')
 end

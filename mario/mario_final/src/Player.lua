@@ -12,11 +12,19 @@ Player = Class{__includes = Entity}
 
 function Player:init(def)
     Entity.init(self, def)
-    self.score = 0
+    self.danceAnimation = Animation {
+        frames = {2, 5, 3, 6},
+        interval = 0.1
+    }
 end
 
 function Player:update(dt)
     Entity.update(self, dt)
+
+    if love.keyboard.isDown('f') and not love.keyboard.isDown('a') and not love.keyboard.isDown('d') then
+        self.currentAnimation = self.danceAnimation
+        self.currentAnimation:update(dt)
+    end
 end
 
 function Player:render()
