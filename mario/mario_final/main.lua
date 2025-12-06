@@ -43,6 +43,12 @@ function love.load()
 
     day = 1
     score = 0
+    level_width = 0
+    max_health = 100
+    health = 100
+
+    high_score = 0
+    highest_day = 1
 
     gSounds['music']:setLooping(true)
     gSounds['music']:setVolume(0.5)
@@ -71,6 +77,13 @@ function love.update(dt)
     gStateMachine:update(dt)
 
     love.keyboard.keysPressed = {}
+
+    if day > highest_day then
+        highest_day = day
+    end
+    if score > high_score then
+        high_score = score
+    end
 end
 
 function love.draw()

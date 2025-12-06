@@ -52,5 +52,11 @@ end
 
 function Flag:onCollide(target)
     day = day + 1
+    score = score + 500
+    health = health + max_health * 0.1
+    if health > max_health then
+        health = max_health
+    end
+    gSounds['level-complete']:play()
     gStateMachine:change('play')
 end

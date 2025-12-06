@@ -37,9 +37,15 @@ function PlayState:init()
     self:spawnEnemies()
 
     self.acidRains = {}
-    for i = 1, 100 do
+    for i = 1, 10 * day + 30 do
+        if level_width < VIRTUAL_WIDTH then
+            max_width = VIRTUAL_WIDTH
+        else
+            max_width = level_width
+        end
+        new_speed = 45 + day * 5
         local acidRain = AcidRain({
-            x = math.random(0, VIRTUAL_WIDTH - 16),
+            x = math.random(0, max_width),
             y = math.random(-VIRTUAL_HEIGHT, 0),
             width = 1,
             height = 4,
@@ -76,7 +82,6 @@ function PlayState:update(dt)
 
     for k, acidRain in pairs(self.acidRains) do
         acidRain:update(dt)
-        acidRain:render()
     end
 end
 
@@ -144,6 +149,19 @@ function PlayState:render()
     love.graphics.print('Day: ' .. tostring(day), VIRTUAL_WIDTH - 60, 5)
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.print('Day: ' .. tostring(day), VIRTUAL_WIDTH - 59, 4)
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.setFont(gFonts['small'])
+    love.graphics.setColor(0, 0, 0, 1)
+    percentage = (health / max_health) * 100
+    love.graphics.printf(tostring(percentage) .. '%', self.player.x - self.camX, self.player.y - 10, self.player.width + 5, "center")
+    if percentage < 30 then
+        love.graphics.setColor(1, 0, 0, 1)
+    elseif percentage < 60 then
+        love.graphics.setColor(1, 1, 0, 1)
+    else
+        love.graphics.setColor(0, 1, 0, 1)
+    end
+    love.graphics.printf(tostring(percentage) .. '%', self.player.x - self.camX - 0.5, self.player.y - 10.5, self.player.width + 5, "center")
     love.graphics.setColor(1, 1, 1, 1)
 end
 

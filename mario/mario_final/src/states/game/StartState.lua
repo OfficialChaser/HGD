@@ -12,6 +12,9 @@ StartState = Class{__includes = BaseState}
 
 function StartState:init()
     day = 1
+    score = 0
+    health = 100
+    max_health = 100
     self.map = LevelMaker.generate(100, 10)
     self.background = ({1, 3})[math.random(2)]
 end
@@ -36,7 +39,17 @@ function StartState:render()
 
     love.graphics.setFont(gFonts['medium'])
     love.graphics.setColor(0, 0, 0, 255)
-    love.graphics.printf('Press Enter', 1, VIRTUAL_HEIGHT / 2 + 17, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('Press Enter', 1, VIRTUAL_HEIGHT / 2 -5 + 1, VIRTUAL_WIDTH, 'center')
     love.graphics.setColor(255, 255, 255, 255)
-    love.graphics.printf('Press Enter', 0, VIRTUAL_HEIGHT / 2 + 16, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf('Press Enter', 0, VIRTUAL_HEIGHT / 2 -5, VIRTUAL_WIDTH, 'center')
+
+    love.graphics.setFont(gFonts['small'])
+    love.graphics.setColor(0, 0, 0, 255)
+    love.graphics.printf('high score: ' .. tostring(high_score) .. '    highest day: ' .. tostring(highest_day), 1,
+        VIRTUAL_HEIGHT / 2 + 17, VIRTUAL_WIDTH, 'center')
+    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.printf('high score: ' .. tostring(high_score) .. '    highest day: ' .. tostring(highest_day), 0,
+        VIRTUAL_HEIGHT / 2 + 16, VIRTUAL_WIDTH, 'center')
+    love.graphics.setColor(255, 255, 255, 255)
+
 end

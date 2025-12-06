@@ -11,6 +11,7 @@
 LevelMaker = Class{}
 
 function LevelMaker.generate(width, height)
+    level_width = width * TILE_SIZE
     local tiles = {}
     local entities = {}
     local objects = {}
@@ -151,7 +152,11 @@ function LevelMaker.generate(width, height)
                                         -- gem has its own function to add to the player's score
                                         onConsume = function(player, object)
                                             gSounds['pickup']:play()
-                                            score = score + 100
+                                            health = health + max_health * 0.15
+                                            if health > max_health then
+                                                health = max_health
+                                            end
+                                            score = score + 200
                                         end
                                     }
                                     

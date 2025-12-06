@@ -61,6 +61,7 @@ gSounds = {
     ['death'] = love.audio.newSource('sounds/death.wav', 'static'),
     ['music'] = love.audio.newSource('sounds/music.wav', 'static'),
     ['powerup-reveal'] = love.audio.newSource('sounds/powerup-reveal.wav', 'static'),
+    ['level-complete'] = love.audio.newSource('sounds/level-complete.mp3', 'static'),
     ['pickup'] = love.audio.newSource('sounds/pickup.wav', 'static'),
     ['empty-block'] = love.audio.newSource('sounds/empty-block.wav', 'static'),
     ['kill'] = love.audio.newSource('sounds/kill.wav', 'static'),

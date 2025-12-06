@@ -47,6 +47,7 @@ function Entity:update(dt)
 end
 
 function Entity:collides(entity)
+    if not entity then return false end
     return not (self.x > entity.x + entity.width or entity.x > self.x + self.width or
                 self.y > entity.y + entity.height or entity.y > self.y + self.height)
 end
