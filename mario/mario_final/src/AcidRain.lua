@@ -8,7 +8,6 @@ function AcidRain:init(def, speed)
     }
     self.currentAnimation = currentAnimation
     self.speed = speed or 30
-    self.gravity = 9.8
 end
 
 function AcidRain:update(dt)
