@@ -49,6 +49,8 @@ function love.load()
     love.mouse.keysReleased = {}
 
     paused = false
+
+    level = 1
 end
 
 function push.resize(w, h)

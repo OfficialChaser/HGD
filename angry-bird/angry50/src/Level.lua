@@ -18,6 +18,7 @@ function Level:init()
     -- actual collision callbacks can cause stack overflow and other errors
     self.destroyedBodies = {}
 
+
     -- define collision callbacks for our world; the World object expects four,
     -- one for different stages of any given collision
     function beginContact(a, b, coll)
@@ -110,25 +111,39 @@ function Level:init()
     -- simple edge shape to represent collision for ground
     self.edgeShape = love.physics.newEdgeShape(0, 0, VIRTUAL_WIDTH * 3, 0)
 
-    -- spawn an alien to try and destroy
-    table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - TILE_SIZE - ALIEN_SIZE / 2, 'Alien'))
+    if level == 1 then
+        -- spawn an alien to try and destroy
+        table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - TILE_SIZE - ALIEN_SIZE / 2, 'Alien'))
+        table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 80, 50, 'Alien'))
 
-    -- spawn a few obstacles
-    table.insert(self.obstacles, Obstacle(self.world, 'vertical',
-        VIRTUAL_WIDTH - 120, VIRTUAL_HEIGHT - 35 - 110 / 2))
-    table.insert(self.obstacles, Obstacle(self.world, 'vertical',
-        VIRTUAL_WIDTH - 35, VIRTUAL_HEIGHT - 35 - 110 / 2))
-    table.insert(self.obstacles, Obstacle(self.world, 'horizontal',
-        VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - 35 - 110 - 35 / 2))
+        -- spawn a few obstacles
+        table.insert(self.obstacles, Obstacle(self.world, 'vertical',
+            VIRTUAL_WIDTH - 120, VIRTUAL_HEIGHT - 35 - 110 / 2))
+        table.insert(self.obstacles, Obstacle(self.world, 'vertical',
+            VIRTUAL_WIDTH - 35, VIRTUAL_HEIGHT - 35 - 110 / 2))
+        table.insert(self.obstacles, Obstacle(self.world, 'horizontal',
+            VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - 35 - 110 - 35 / 2))
+        table.insert(self.obstacles, Obstacle(self.world, 'vertical',
+            VIRTUAL_WIDTH - 80, 120))
+    elseif level == 2 then
+            -- spawn an alien to try and destroy
+        table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - TILE_SIZE - ALIEN_SIZE / 2, 'Alien'))
+        table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 80, 50, 'Alien'))
 
-    -- ground data
-    self.groundBody = love.physics.newBody(self.world, -VIRTUAL_WIDTH, VIRTUAL_HEIGHT - 35, 'static')
-    self.groundFixture = love.physics.newFixture(self.groundBody, self.edgeShape)
-    self.groundFixture:setFriction(0.5)
-    self.groundFixture:setUserData('Ground')
+        -- spawn a few obstacles
+        table.insert(self.obstacles, Obstacle(self.world, 'vertical',
+            VIRTUAL_WIDTH - 120, VIRTUAL_HEIGHT - 35 - 110 / 2))
+        table.insert(self.obstacles, Obstacle(self.world, 'vertical',
+            VIRTUAL_WIDTH - 35, VIRTUAL_HEIGHT - 35 - 110 / 2))
+    end
+-- ground data
+self.groundBody = love.physics.newBody(self.world, -VIRTUAL_WIDTH, VIRTUAL_HEIGHT - 35, 'static')
+self.groundFixture = love.physics.newFixture(self.groundBody, self.edgeShape)
+self.groundFixture:setFriction(0.5)
+self.groundFixture:setUserData('Ground')
 
-    -- background graphics
-    self.background = Background()
+-- background graphics
+self.background = Background()
 end
 
 function Level:update(dt)
@@ -176,13 +191,14 @@ function Level:update(dt)
         local xVel, yVel = self.launchMarker.alien.body:getLinearVelocity()
         
         -- if we fired our alien to the left or it's almost done rolling, respawn
-        if xPos < 0 or (math.abs(xVel) + math.abs(yVel) < 1.5) then
+        if xPos < 0 or (math.abs(xVel) + math.abs(yVel) < 3) then
             self.launchMarker.alien.body:destroy()
             self.launchMarker = AlienLaunchMarker(self.world)
 
             -- re-initialize level if we have no more aliens
             if #self.aliens == 0 then
-                gStateMachine:change('start')
+                level = level + 1
+                gStateMachine:change('play')
             end
         end
     end

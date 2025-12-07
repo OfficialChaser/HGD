@@ -11,13 +11,16 @@ PlayState = Class{__includes = BaseState}
 function PlayState:init()
     self.level = Level()
     self.levelTranslateX = 0
+    self.max_scroll = 1500
 end
 
 function PlayState:update(dt)
     if love.keyboard.wasPressed('escape') then
         love.event.quit()
     end
-
+    if love.keyboard.wasPressed('r') then
+        gStateMachine:change('play')
+    end
     -- update camera
     if love.keyboard.isDown('left') then
         self.levelTranslateX = self.levelTranslateX + MAP_SCROLL_X_SPEED * dt
@@ -40,6 +43,7 @@ function PlayState:update(dt)
             self.level.background:update(dt)
         end
     end
+
 
     self.level:update(dt)
 end
