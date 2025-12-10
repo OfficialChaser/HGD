@@ -112,6 +112,7 @@ function Level:init()
     self.edgeShape = love.physics.newEdgeShape(0, 0, VIRTUAL_WIDTH * 3, 0)
 
     if level == 1 then
+        launchesLeft = 1
         -- spawn an alien to try and destroy
         table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - TILE_SIZE - ALIEN_SIZE / 2, 'Alien'))
         table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 80, 50, 'Alien'))
@@ -126,6 +127,7 @@ function Level:init()
         table.insert(self.obstacles, Obstacle(self.world, 'vertical',
             VIRTUAL_WIDTH - 80, 120))
     elseif level == 2 then
+        launchesLeft = 2
             -- spawn an alien to try and destroy
         table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - TILE_SIZE - ALIEN_SIZE / 2, 'Alien'))
         table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 80, 50, 'Alien'))
@@ -191,16 +193,15 @@ function Level:update(dt)
         local xVel, yVel = self.launchMarker.alien.body:getLinearVelocity()
         
         -- if we fired our alien to the left or it's almost done rolling, respawn
-        if xPos < 0 or (math.abs(xVel) + math.abs(yVel) < 3) then
+        if (xPos < 0 or (math.abs(xVel) < 20 and math.abs(yVel) < 1 and yPos < VIRTUAL_HEIGHT - 35)) and launchesLeft > 0 then
             self.launchMarker.alien.body:destroy()
             self.launchMarker = AlienLaunchMarker(self.world)
-
-            -- re-initialize level if we have no more aliens
-            if #self.aliens == 0 then
-                level = level + 1
-                gStateMachine:change('play')
-            end
         end
+    end
+
+    if #self.aliens == 0 and level ~= final_level then
+        level = level + 1
+        gStateMachine:change('play')
     end
 end
 
@@ -221,8 +222,8 @@ function Level:render()
         obstacle:render()
     end
 
-    -- render instruction text if we haven't launched bird
-    if not self.launchMarker.launched then
+    -- render instruction text if we haven't launched bird and level is 1
+    if not self.launchMarker.launched and level == 1 then
         love.graphics.setFont(gFonts['medium'])
         love.graphics.setColor(0, 0, 0, 1)
         love.graphics.printf('Click and drag circular alien to shoot!',

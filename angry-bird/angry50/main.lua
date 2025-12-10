@@ -42,7 +42,7 @@ function love.load()
     gStateMachine:change('start')
 
     gSounds['music']:setLooping(true)
-    gSounds['music']:play()
+    --gSounds['music']:play()
 
     love.keyboard.keysPressed = {}
     love.mouse.keysPressed = {}
@@ -51,6 +51,8 @@ function love.load()
     paused = false
 
     level = 1
+    launchesLeft = 1
+    final_level = 2
 end
 
 function push.resize(w, h)

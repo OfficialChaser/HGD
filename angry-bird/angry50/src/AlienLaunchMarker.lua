@@ -45,6 +45,9 @@ function AlienLaunchMarker:update(dt)
         elseif love.mouse.wasReleased(1) and self.aiming then
             self.launched = true
 
+            -- decrease launches left
+            launchesLeft = launchesLeft - 1
+
             -- spawn new alien in the world, passing in user data of player
             self.alien = Alien(self.world, 'round', self.shiftedX, self.shiftedY, 'Player')
 
