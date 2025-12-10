@@ -13,8 +13,9 @@
 
 Obstacle = Class{}
 
-function Obstacle:init(world, shape, x, y)
+function Obstacle:init(world, shape, x, y, health)
     self.shape = shape or 'horizontal'
+    self.initialShape = shape or 'horizontal'
 
     if self.shape == 'horizontal' then
         self.frame = 2
@@ -26,6 +27,8 @@ function Obstacle:init(world, shape, x, y)
     self.startY = y
 
     self.world = world
+
+    self.health = health or 1
 
     self.body = love.physics.newBody(self.world, 
         self.startX or math.random(VIRTUAL_WIDTH), self.startY or math.random(VIRTUAL_HEIGHT - 35), 'dynamic')
@@ -43,11 +46,19 @@ function Obstacle:init(world, shape, x, y)
 
     self.fixture = love.physics.newFixture(self.body, self.shape)
 
-    self.fixture:setUserData('Obstacle')
+    self.fixture:setUserData(self)
+end
+
+function Obstacle:getHealth()
+    return self.health
 end
 
 function Obstacle:update(dt)
-
+    if self.initialShape == 'horizontal' and self.health == 1 then
+        self.frame = 1
+    elseif self.initialShape == 'vertical' and self.health == 1 then
+        self.frame = 3
+    end
 end
 
 function Obstacle:render()

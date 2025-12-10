@@ -21,65 +21,81 @@ function Level:init()
 
     -- define collision callbacks for our world; the World object expects four,
     -- one for different stages of any given collision
-    function beginContact(a, b, coll)
-        local types = {}
-        types[a:getUserData()] = true
-        types[b:getUserData()] = true
+function beginContact(a, b, coll)
+    local udA = a:getUserData()
+    local udB = b:getUserData()
 
-        -- if we collided between both the player and an obstacle...
-        if types['Obstacle'] and types['Player'] then
+    -- convenience functions
+    local function isPlayer(ud) return ud == 'Player' end
+    local function isAlien(ud) return ud == 'Alien' end
+    local function isObstacle(ud) return type(ud) == 'table' and ud.__index == Obstacle end
+    local function isGround(ud) return ud == 'Ground' end
 
-            -- grab the body that belongs to the player
-            local playerFixture = a:getUserData() == 'Player' and a or b
-            local obstacleFixture = a:getUserData() == 'Obstacle' and a or b
-            
-            -- destroy the obstacle if player's combined X/Y velocity is high enough
-            local velX, velY = playerFixture:getBody():getLinearVelocity()
-            local sumVel = math.abs(velX) + math.abs(velY)
+    -----------------------------------------------------
+    -- PLAYER + OBSTACLE
+    -----------------------------------------------------
+    if (isPlayer(udA) and isObstacle(udB)) or (isPlayer(udB) and isObstacle(udA)) then
+        local playerFixture = isPlayer(udA) and a or b
+        local obstacle = isObstacle(udA) and udA or udB
 
-            if sumVel > 20 then
-                table.insert(self.destroyedBodies, obstacleFixture:getBody())
+        local vx, vy = playerFixture:getBody():getLinearVelocity()
+        local speed = math.abs(vx) + math.abs(vy)
+
+        if speed > 20 then
+            if obstacle:getHealth() == 1 then
+                table.insert(self.destroyedBodies, obstacle.body)
+            else
+                obstacle.health = obstacle.health - 1
             end
-        end
-
-        -- if we collided between an obstacle and an alien, as by debris falling...
-        if types['Obstacle'] and types['Alien'] then
-
-            -- grab the body that belongs to the player
-            local obstacleFixture = a:getUserData() == 'Obstacle' and a or b
-            local alienFixture = a:getUserData() == 'Alien' and a or b
-
-            -- destroy the alien if falling debris is falling fast enough
-            local velX, velY = obstacleFixture:getBody():getLinearVelocity()
-            local sumVel = math.abs(velX) + math.abs(velY)
-
-            if sumVel > 20 then
-                table.insert(self.destroyedBodies, alienFixture:getBody())
-            end
-        end
-
-        -- if we collided between the player and the alien...
-        if types['Player'] and types['Alien'] then
-
-            -- grab the bodies that belong to the player and alien
-            local playerFixture = a:getUserData() == 'Player' and a or b
-            local alienFixture = a:getUserData() == 'Alien' and a or b
-
-            -- destroy the alien if player is traveling fast enough
-            local velX, velY = playerFixture:getBody():getLinearVelocity()
-            local sumVel = math.abs(velX) + math.abs(velY)
-
-            if sumVel > 20 then
-                table.insert(self.destroyedBodies, alienFixture:getBody())
-            end
-        end
-
-        -- if we hit the ground, play a bounce sound
-        if types['Player'] and types['Ground'] then
-            gSounds['bounce']:stop()
-            gSounds['bounce']:play()
         end
     end
+
+    -----------------------------------------------------
+    -- OBSTACLE + ALIEN (FALLING DEBRIS)
+    -----------------------------------------------------
+    if (isObstacle(udA) and isAlien(udB)) or (isObstacle(udB) and isAlien(udA)) then
+        local obstacleUD = isObstacle(udA) and udA or udB
+        local alienUD    = isAlien(udA) and udA or udB
+
+        -- Get the actual FIXTURES
+        local obstacleFix = isObstacle(udA) and a or b
+        local alienFix    = isAlien(udA) and a or b
+
+        -- Get obstacle velocity from its FIXTURE (not userdata)
+        local vx, vy = obstacleFix:getBody():getLinearVelocity()
+        local speed = math.abs(vx) + math.abs(vy)
+
+        if speed > 10 then
+            -- DESTROY using the FIXTURE's body
+            table.insert(self.destroyedBodies, alienFix:getBody())
+        end
+    end
+
+
+    -----------------------------------------------------
+    -- PLAYER + ALIEN
+    -----------------------------------------------------
+    if (isPlayer(udA) and isAlien(udB)) or (isPlayer(udB) and isAlien(udA)) then
+        local playerFix = isPlayer(udA) and a or b
+        local alien     = isAlien(udA) and udA or udB
+
+        local vx, vy = playerFix:getBody():getLinearVelocity()
+        local speed = math.abs(vx) + math.abs(vy)
+
+        if speed > 40 then
+            table.insert(self.destroyedBodies, alien.body)
+        end
+    end
+
+    -----------------------------------------------------
+    -- PLAYER + GROUND (play bounce sound)
+    -----------------------------------------------------
+    if (isPlayer(udA) and isGround(udB)) or (isPlayer(udB) and isGround(udA)) then
+        gSounds['bounce']:stop()
+        gSounds['bounce']:play()
+    end
+end
+
 
     -- the remaining three functions here are sample definitions, but we are not
     -- implementing any functionality with them in this demo; use-case specific
@@ -112,20 +128,19 @@ function Level:init()
     self.edgeShape = love.physics.newEdgeShape(0, 0, VIRTUAL_WIDTH * 3, 0)
 
     if level == 1 then
-        launchesLeft = 1
+        launchesLeft = 2
         -- spawn an alien to try and destroy
         table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - TILE_SIZE - ALIEN_SIZE / 2, 'Alien'))
-        table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 80, 50, 'Alien'))
 
         -- spawn a few obstacles
         table.insert(self.obstacles, Obstacle(self.world, 'vertical',
-            VIRTUAL_WIDTH - 120, VIRTUAL_HEIGHT - 35 - 110 / 2))
+            VIRTUAL_WIDTH - 120, VIRTUAL_HEIGHT - 35 - 110 / 2, 2))
         table.insert(self.obstacles, Obstacle(self.world, 'vertical',
-            VIRTUAL_WIDTH - 35, VIRTUAL_HEIGHT - 35 - 110 / 2))
+            VIRTUAL_WIDTH - 35, VIRTUAL_HEIGHT - 35 - 110 / 2, 2))
         table.insert(self.obstacles, Obstacle(self.world, 'horizontal',
             VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - 35 - 110 - 35 / 2))
         table.insert(self.obstacles, Obstacle(self.world, 'vertical',
-            VIRTUAL_WIDTH - 80, 120))
+            VIRTUAL_WIDTH - 80, 120, 2))
     elseif level == 2 then
         launchesLeft = 2
             -- spawn an alien to try and destroy
@@ -193,7 +208,7 @@ function Level:update(dt)
         local xVel, yVel = self.launchMarker.alien.body:getLinearVelocity()
         
         -- if we fired our alien to the left or it's almost done rolling, respawn
-        if (xPos < 0 or (math.abs(xVel) < 20 and math.abs(yVel) < 1 and yPos < VIRTUAL_HEIGHT - 35)) and launchesLeft > 0 then
+        if (xPos < 0 or (math.abs(xVel) < 20 and math.abs(yVel) < 1 and yPos > VIRTUAL_HEIGHT - 70)) and launchesLeft > 0 then
             self.launchMarker.alien.body:destroy()
             self.launchMarker = AlienLaunchMarker(self.world)
         end
@@ -219,6 +234,7 @@ function Level:render()
     end
 
     for k, obstacle in pairs(self.obstacles) do
+        obstacle:update()
         obstacle:render()
     end
 
