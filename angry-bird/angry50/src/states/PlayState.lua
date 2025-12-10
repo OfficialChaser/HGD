@@ -74,28 +74,36 @@ function PlayState:render()
     love.graphics.setFont(gFonts['medium'])
     love.graphics.setColor(0, 0, 1, 1)
     love.graphics.printf('Launches Left: ' .. tostring(launchesLeft), 0, 35, VIRTUAL_WIDTH, 'center')
+    love.graphics.setColor(1, 1, 1, 1)
     
     -- Print restart if needed
-    love.graphics.setFont(gFonts['medium'])
-    love.graphics.setColor(1, 0, 0, 1)
-    if canRestart then
-        love.graphics.print('Press [R] to Restart', VIRTUAL_WIDTH - 180, 5)
-    end
-    love.graphics.setColor(1, 1, 1, 1)
+    if level_complete then
+        love.graphics.setFont(gFonts['huge'])
+        love.graphics.setColor(0, 0, 0, 1)
+        love.graphics.printf('VICTORY', 0, VIRTUAL_HEIGHT / 2 - 32, VIRTUAL_WIDTH, 'center')
+        love.graphics.setColor(1, 1, 1, 1)
+    else
+        love.graphics.setFont(gFonts['medium'])
+        love.graphics.setColor(1, 0, 0, 1)
+        if canRestart then
+            love.graphics.print('Press [R] to Restart', VIRTUAL_WIDTH - 180, 5)
+        end
+        love.graphics.setColor(1, 1, 1, 1)
 
-    love.graphics.translate(math.floor(self.levelTranslateX), 0)
+        love.graphics.translate(math.floor(self.levelTranslateX), 0)
+    end
     self.level:render()
 end
 
 function PlayState:updatePlayerTracker(dt)
     launchedPlayer = self.level.launchMarker.alien
-
+    
     if launchedPlayer then
         timeAfterLaunch = timeAfterLaunch + dt
         local launchedX, launchedY = launchedPlayer.body:getPosition()
         local launchedVelX, launchedVelY = launchedPlayer.body:getLinearVelocity()
 
-        if timeAfterLaunch > 3 and (math.abs(launchedVelX) + math.abs(launchedVelY) < 100) then
+        if timeAfterLaunch > 3 and (math.abs(launchedVelX) + math.abs(launchedVelY) < 100) and not level_complete then
             canRestart = true
         end
 

@@ -54,10 +54,6 @@ function beginContact(a, b, coll)
     -- OBSTACLE + ALIEN (FALLING DEBRIS)
     -----------------------------------------------------
     if (isObstacle(udA) and isAlien(udB)) or (isObstacle(udB) and isAlien(udA)) then
-        local obstacleUD = isObstacle(udA) and udA or udB
-        local alienUD    = isAlien(udA) and udA or udB
-
-        -- Get the actual FIXTURES
         local obstacleFix = isObstacle(udA) and a or b
         local alienFix    = isAlien(udA) and a or b
 
@@ -65,7 +61,7 @@ function beginContact(a, b, coll)
         local vx, vy = obstacleFix:getBody():getLinearVelocity()
         local speed = math.abs(vx) + math.abs(vy)
 
-        if speed > 10 then
+        if speed > 100 then
             -- DESTROY using the FIXTURE's body
             table.insert(self.destroyedBodies, alienFix:getBody())
         end
@@ -77,13 +73,14 @@ function beginContact(a, b, coll)
     -----------------------------------------------------
     if (isPlayer(udA) and isAlien(udB)) or (isPlayer(udB) and isAlien(udA)) then
         local playerFix = isPlayer(udA) and a or b
-        local alien     = isAlien(udA) and udA or udB
+        local alienFix = isAlien(udA) and a or b
 
+        -- Get obstacle velocity from its FIXTURE (not userdata)
         local vx, vy = playerFix:getBody():getLinearVelocity()
         local speed = math.abs(vx) + math.abs(vy)
 
-        if speed > 40 then
-            table.insert(self.destroyedBodies, alien.body)
+        if speed > 60 then
+            table.insert(self.destroyedBodies, alienFix:getBody())
         end
     end
 
@@ -128,6 +125,7 @@ end
     self.edgeShape = love.physics.newEdgeShape(0, 0, VIRTUAL_WIDTH * 3, 0)
 
     if level == 1 then
+        level_complete = false
         launchesLeft = 2
         -- spawn an alien to try and destroy
         table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - TILE_SIZE - ALIEN_SIZE / 2, 'Alien'))
@@ -142,6 +140,7 @@ end
         table.insert(self.obstacles, Obstacle(self.world, 'vertical',
             VIRTUAL_WIDTH - 80, 120, 2))
     elseif level == 2 then
+        level_complete = false
         launchesLeft = 2
             -- spawn an alien to try and destroy
         table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - TILE_SIZE - ALIEN_SIZE / 2, 'Alien'))
@@ -164,7 +163,6 @@ self.background = Background()
 end
 
 function Level:update(dt)
-    
     -- update launch marker, which shows trajectory
     self.launchMarker:update(dt)
 
@@ -215,8 +213,14 @@ function Level:update(dt)
     end
 
     if #self.aliens == 0 and level ~= final_level then
-        level = level + 1
-        gStateMachine:change('play')
+        level_complete = true
+        countdownToTransition(dt)
+        if canTransition then
+            print("transitioned")
+            level = level + 1
+            gStateMachine:change('play')
+            canTransition = false
+        end
     end
 end
 
@@ -244,14 +248,6 @@ function Level:render()
         love.graphics.setColor(0, 0, 0, 1)
         love.graphics.printf('Click and drag circular alien to shoot!',
             0, 64, VIRTUAL_WIDTH, 'center')
-        love.graphics.setColor(1, 1, 1, 1)
-    end
-
-    -- render victory text if all aliens are dead
-    if #self.aliens == 0 then
-        love.graphics.setFont(gFonts['huge'])
-        love.graphics.setColor(0, 0, 0, 1)
-        love.graphics.printf('VICTORY', 0, VIRTUAL_HEIGHT / 2 - 32, VIRTUAL_WIDTH, 'center')
         love.graphics.setColor(1, 1, 1, 1)
     end
 end

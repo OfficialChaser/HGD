@@ -53,6 +53,10 @@ function love.load()
     level = 1
     launchesLeft = 1
     final_level = 2
+    level_complete = false
+
+    canTransition = false
+    transitionTimer = 3.0
 end
 
 function push.resize(w, h)
@@ -101,4 +105,12 @@ function love.draw()
     push:start()
     gStateMachine:render()
     push:finish()
+end
+
+function countdownToTransition(dt)
+    transitionTimer = transitionTimer - dt
+    if transitionTimer < 0 then
+        canTransition = true
+        transitionTimer = 3.0
+    end
 end
