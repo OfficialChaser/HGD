@@ -126,7 +126,7 @@ end
 
     if level == 1 then
         level_complete = false
-        launchesLeft = 2
+        launchesLeft = 1
         -- spawn an alien to try and destroy
         table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - TILE_SIZE - ALIEN_SIZE / 2, 'Alien'))
 
@@ -151,7 +151,47 @@ end
             VIRTUAL_WIDTH - 120, VIRTUAL_HEIGHT - 35 - 110 / 2))
         table.insert(self.obstacles, Obstacle(self.world, 'vertical',
             VIRTUAL_WIDTH - 35, VIRTUAL_HEIGHT - 35 - 110 / 2))
+    elseif level == 3 then
+        level_complete = false
+        launchesLeft = 3
+
+        -- spawn aliens (more spread out, higher difficulty)
+        table.insert(self.aliens, Alien(self.world, 'square',
+            VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - TILE_SIZE - ALIEN_SIZE / 2, 'Alien'))
+
+        table.insert(self.aliens, Alien(self.world, 'square',
+            VIRTUAL_WIDTH - 80, 70, 'Alien'))
+
+        table.insert(self.aliens, Alien(self.world, 'square',
+            VIRTUAL_WIDTH - 150, VIRTUAL_HEIGHT / 2, 'Alien'))
+
+        -- obstacles layer 1 (bottom foundation)
+        table.insert(self.obstacles, Obstacle(self.world, 'vertical',
+            VIRTUAL_WIDTH - 120, VIRTUAL_HEIGHT - 35 - 110 / 2, 3))
+
+        table.insert(self.obstacles, Obstacle(self.world, 'vertical',
+            VIRTUAL_WIDTH - 35, VIRTUAL_HEIGHT - 35 - 110 / 2, 3))
+
+        -- horizontal platform connecting them
+        table.insert(self.obstacles, Obstacle(self.world, 'horizontal',
+            VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - 35 - 110 - 35 / 2))
+
+        -- second floor posts
+        table.insert(self.obstacles, Obstacle(self.world, 'vertical',
+            VIRTUAL_WIDTH - 120, VIRTUAL_HEIGHT - 200, 2))
+
+        table.insert(self.obstacles, Obstacle(self.world, 'vertical',
+            VIRTUAL_WIDTH - 35, VIRTUAL_HEIGHT - 200, 2))
+
+        -- second floor platform
+        table.insert(self.obstacles, Obstacle(self.world, 'horizontal',
+            VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - 240))
+
+        -- protective top pillar for the top alien
+        table.insert(self.obstacles, Obstacle(self.world, 'vertical',
+            VIRTUAL_WIDTH - 80, 140, 2))
     end
+    maxLaunches = launchesLeft
 -- ground data
 self.groundBody = love.physics.newBody(self.world, -VIRTUAL_WIDTH, VIRTUAL_HEIGHT - 35, 'static')
 self.groundFixture = love.physics.newFixture(self.groundBody, self.edgeShape)
@@ -212,13 +252,18 @@ function Level:update(dt)
         end
     end
 
-    if #self.aliens == 0 and level ~= final_level then
+    if #self.aliens == 0 then
         level_complete = true
         countdownToTransition(dt)
         if canTransition then
             print("transitioned")
             level = level + 1
-            gStateMachine:change('play')
+            if level > final_level then
+                level = 1
+                gStateMachine:change('start')
+            else
+                gStateMachine:change('play')
+            end
             canTransition = false
         end
     end

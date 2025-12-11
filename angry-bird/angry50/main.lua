@@ -51,8 +51,9 @@ function love.load()
     paused = false
 
     level = 1
+    maxLaunches = 1
     launchesLeft = 1
-    final_level = 2
+    final_level = 3
     level_complete = false
 
     canTransition = false
