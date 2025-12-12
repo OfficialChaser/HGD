@@ -80,7 +80,11 @@ function PlayState:render()
     if level_complete then
         love.graphics.setFont(gFonts['huge'])
         love.graphics.setColor(0, 0, 0, 1)
-        love.graphics.printf('VICTORY', 0, VIRTUAL_HEIGHT / 2 - 32, VIRTUAL_WIDTH, 'center')
+        local msg = 'VICTORY'
+        if level == final_level then
+            msg = 'YOU WIN!'
+        end
+        love.graphics.printf(msg, 0, VIRTUAL_HEIGHT / 2 - 32, VIRTUAL_WIDTH, 'center')
         love.graphics.setColor(1, 1, 1, 1)
     else
         love.graphics.setFont(gFonts['medium'])

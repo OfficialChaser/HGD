@@ -141,7 +141,7 @@ end
             VIRTUAL_WIDTH - 80, 120, 2))
     elseif level == 2 then
         level_complete = false
-        launchesLeft = 2
+        launchesLeft = 1
             -- spawn an alien to try and destroy
         table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - TILE_SIZE - ALIEN_SIZE / 2, 'Alien'))
         table.insert(self.aliens, Alien(self.world, 'square', VIRTUAL_WIDTH - 80, 50, 'Alien'))
@@ -160,36 +160,29 @@ end
             VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - TILE_SIZE - ALIEN_SIZE / 2, 'Alien'))
 
         table.insert(self.aliens, Alien(self.world, 'square',
-            VIRTUAL_WIDTH - 80, 70, 'Alien'))
-
-        table.insert(self.aliens, Alien(self.world, 'square',
-            VIRTUAL_WIDTH - 150, VIRTUAL_HEIGHT / 2, 'Alien'))
+            VIRTUAL_WIDTH - 80, 130, 'Alien'))
 
         -- obstacles layer 1 (bottom foundation)
         table.insert(self.obstacles, Obstacle(self.world, 'vertical',
-            VIRTUAL_WIDTH - 120, VIRTUAL_HEIGHT - 35 - 110 / 2, 3))
+            VIRTUAL_WIDTH - 115, VIRTUAL_HEIGHT - 55, 2))
 
         table.insert(self.obstacles, Obstacle(self.world, 'vertical',
-            VIRTUAL_WIDTH - 35, VIRTUAL_HEIGHT - 35 - 110 / 2, 3))
+            VIRTUAL_WIDTH - 45, VIRTUAL_HEIGHT - 55, 2))
 
         -- horizontal platform connecting them
         table.insert(self.obstacles, Obstacle(self.world, 'horizontal',
             VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - 35 - 110 - 35 / 2))
 
-        -- second floor posts
         table.insert(self.obstacles, Obstacle(self.world, 'vertical',
-            VIRTUAL_WIDTH - 120, VIRTUAL_HEIGHT - 200, 2))
+            VIRTUAL_WIDTH /2, VIRTUAL_HEIGHT -55, 2))
 
         table.insert(self.obstacles, Obstacle(self.world, 'vertical',
-            VIRTUAL_WIDTH - 35, VIRTUAL_HEIGHT - 200, 2))
+            VIRTUAL_WIDTH /2, VIRTUAL_HEIGHT - 200, 2))
 
-        -- second floor platform
-        table.insert(self.obstacles, Obstacle(self.world, 'horizontal',
-            VIRTUAL_WIDTH - 80, VIRTUAL_HEIGHT - 240))
-
-        -- protective top pillar for the top alien
         table.insert(self.obstacles, Obstacle(self.world, 'vertical',
-            VIRTUAL_WIDTH - 80, 140, 2))
+            VIRTUAL_WIDTH - 45, VIRTUAL_HEIGHT - 230, 2))
+
+
     end
     maxLaunches = launchesLeft
 -- ground data
