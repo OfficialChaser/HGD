@@ -53,8 +53,23 @@ function PlayState:update(dt)
         self.won = true
         self.hole:startSink(self.ball)
         ball_drop:play()
+        if self.levelNumber == #Level.levels then
+            -- Last level completed
+            Transition:start(function()
+                gStateMachine:change('start', 1) end, 1.5, 1)
+            return
+        end
         Transition:start(function()
             gStateMachine:change('play', self.levelNumber + 1) end, 1.5, 1)
+    end
+
+    if  self.ball.strokes == self.levelData.par and self.ball.body:getLinearVelocity() == 0 and not self.won then
+        if mulligans <= 0 then
+            Transition:start(function()
+                gStateMachine:change('start', self.levelNumber) end, 1.5, 1)
+        else
+            self:mulligan()
+        end
     end
 end
 
@@ -98,15 +113,35 @@ function PlayState:render()
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.print('Level ' .. tostring(self.levelNumber), 10, 10)
 
-    -- Drawn Instructions
+    -- Draw Instructions
     if self.levelNumber == 1 then
         love.graphics.setColor(0, 0, 0, 1)
         love.graphics.setFont(reg_font)
-        love.graphics.print('Click and drag the ball to putt', 120 - 2, 82)
+        love.graphics.print('Click and drag the ball to putt', 120 - 2, 90)
         love.graphics.setColor(1, 1, 1, 1)
-        love.graphics.print('Click and drag the ball to putt', 120, 80)
+        love.graphics.print('Click and drag the ball to putt', 120, 88)
     end
 
+    -- Draw Par
+    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.setFont(reg_font)
+    love.graphics.print('Par: ' .. tostring(self.levelData.par), VIRTUAL_WIDTH - 92, 12)
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.print('Par: ' .. tostring(self.levelData.par), VIRTUAL_WIDTH - 90, 10)
+
+    -- Draw Strokes
+    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.setFont(reg_font)
+    love.graphics.print('Strokes: ' .. tostring(self.ball.strokes), VIRTUAL_WIDTH - 154, 42)
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.print('Strokes: ' .. tostring(self.ball.strokes), VIRTUAL_WIDTH - 152, 40)
+
+    -- Draw Mulligans
+    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.setFont(reg_font)
+    love.graphics.print('Mulligans: ' .. tostring(mulligans), 242, 12)
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.print('Mulligans: ' .. tostring(mulligans), 244, 10)
 end
 
 -------------------------------------------------
@@ -135,5 +170,20 @@ function PlayState:keypressed(key)
         Transition:start(function()
             gStateMachine:change('play', gStateMachine.current.levelNumber)
         end)
+    end
+
+    if key == 'm' and mulligans > 0 and not Transition.active and self.ball.body:getLinearVelocity() == 0 then
+        self:mulligan()
+    end
+end
+
+function PlayState:mulligan()
+    past_pos = self.ball.body:getPosition()
+    self.ball.body:setPosition(self.ball.prevX, self.ball.prevY)
+    self.ball.body:setLinearVelocity(0, 0)
+
+    if past_pos ~= self.ball.body:getPosition() then
+        mulligans = mulligans - 1
+        self.ball.strokes = math.max(0, self.ball.strokes - 1)
     end
 end

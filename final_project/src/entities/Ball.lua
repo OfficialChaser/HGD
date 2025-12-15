@@ -15,6 +15,10 @@ function Ball:init(world, x, y)
     self.dragging = false
 
     self.speed = 0.0
+
+    self.strokes = 0
+
+    self.prevX, self.prevY = x, y
 end
 
 function Ball:update(dt)
@@ -52,8 +56,9 @@ function Ball:mousereleased(x, y)
 
     local fx = self.startX - x
     local fy = self.startY - y
-
+    self.prevX, self.prevY = self.body:getPosition()
     self.body:applyLinearImpulse(fx * 2, fy * 2)
+    self.strokes = self.strokes + 1
     self.dragging = false
 end
 

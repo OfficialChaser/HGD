@@ -30,6 +30,7 @@ end
 
 function StartState:keypressed(key)
     if key and not Transition.active then
+        mulligans = 3
         Transition:start(function()
             gStateMachine:change('play', 1)
         end)

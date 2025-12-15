@@ -33,6 +33,9 @@ function love.load()
     track2:setLooping(true)
     track3:setLooping(true)
     track1:play()
+
+    -- Global variables
+    mulligans = 3
 end
 
 -------------------------------------------------

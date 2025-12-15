@@ -28,6 +28,7 @@ hit_wall = love.audio.newSource('sounds/hit_wall.wav', 'static')
 -- Misc
 require 'src/Level'
 Transition = require 'src/Transition'
+TextTransition = require 'src/TextTransition'
 
 -- Background
 backgroundOffsetX = 0
