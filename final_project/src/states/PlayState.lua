@@ -13,11 +13,24 @@ function PlayState:enter(level_num)
 
     -- Walls
     self.walls = {}
+
     for _, w in pairs(self.levelData.walls) do
-        local body = love.physics.newBody(self.world, 0, 0, 'static')
-        local shape = love.physics.newEdgeShape(unpack(w))
-        love.physics.newFixture(body, shape)
-        table.insert(self.walls, shape)
+        local body = love.physics.newBody(
+            self.world,
+            w.x + w.w / 2,
+            w.y + w.h / 2,
+            'static'
+        )
+
+        local shape = love.physics.newRectangleShape(w.w, w.h)
+        local fixture = love.physics.newFixture(body, shape)
+
+        table.insert(self.walls, {
+            body = body,
+            shape = shape,
+            w = w.w,
+            h = w.h
+        })
     end
 end
 
@@ -29,13 +42,38 @@ end
 function PlayState:render()
     -- Draw walls
     love.graphics.setColor(1, 1, 1, 1)
-    for _, shape in pairs(self.walls) do
-        local bx1, by1, bx2, by2 = shape:getPoints()
-        love.graphics.line(bx1, by1, bx2, by2)
+    for _, wall in pairs(self.walls) do
+        local x, y = wall.body:getPosition()
+
+        love.graphics.setColor(0.55, 0.27, 0.07, 1)
+        love.graphics.rectangle(
+            'fill',
+            x - wall.w / 2,
+            y - wall.h / 2,
+            wall.w,
+            wall.h
+        )
     end
 
     -- Draw ball
     self.ball:render()
+
+    -- Draw Level
+    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.setFont(reg_font)
+    love.graphics.print('Level ' .. tostring(self.levelNumber), 8, 12)
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.print('Level ' .. tostring(self.levelNumber), 10, 10)
+
+    -- Drawn Instructions
+    if self.levelNumber == 1 then
+        love.graphics.setColor(0, 0, 0, 1)
+        love.graphics.setFont(reg_font)
+        love.graphics.print('Click and drag the ball to putt', 120 - 2, 82)
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.print('Click and drag the ball to putt', 120, 80)
+    end
+
 end
 
 -------------------------------------------------

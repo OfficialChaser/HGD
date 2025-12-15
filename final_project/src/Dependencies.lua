@@ -17,6 +17,10 @@ big_font = love.graphics.newFont('fonts/PixelOperator8-Bold.ttf', 48)
 reg_font = love.graphics.newFont('fonts/PixelOperator8-Bold.ttf', 16)
 small_font = love.graphics.newFont('fonts/PixelOperator8-Bold.ttf', 8)
 
+track1 = love.audio.newSource('sounds/track1.mp3', 'stream')
+track2 = love.audio.newSource('sounds/track2.mp3', 'stream')
+track3 = love.audio.newSource('sounds/track3.mp3', 'stream')
+
 -- Misc
 require 'src/Level'
 

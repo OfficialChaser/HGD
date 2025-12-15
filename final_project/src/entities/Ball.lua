@@ -64,6 +64,7 @@ function Ball:render()
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.circle('fill', bx, by, self.radius)
 
+    love.graphics.setLineWidth(2)
     -- Aim radius
     if self.speed == 0 then
         love.graphics.circle('line', bx, by, self.aim_radius)
