@@ -59,16 +59,23 @@ end
 
 function Ball:render()
     local bx, by = self.body:getPosition()
+    
+    love.graphics.setLineWidth(2)
+    
+    -- Aim radius
+    if self.speed == 0 then
+        
+        love.graphics.setColor(0, 0, 0, 0.15)
+        love.graphics.circle('fill', bx, by, self.aim_radius)
+    end
+
+    -- Outline
+    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.circle('fill', bx, by, self.radius + 2)
 
     -- Ball
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.circle('fill', bx, by, self.radius)
-
-    love.graphics.setLineWidth(2)
-    -- Aim radius
-    if self.speed == 0 then
-        love.graphics.circle('line', bx, by, self.aim_radius)
-    end
 
     -- Aim line
     if self.dragging then

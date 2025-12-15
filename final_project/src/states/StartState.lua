@@ -19,9 +19,9 @@ function StartState:render()
     -- Credits
     love.graphics.setFont(small_font)
     love.graphics.setColor(0, 0, 0, 1)
-    love.graphics.printf("A game by Chase Maciel", 0, VIRTUAL_HEIGHT - 30, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf("A Game by OfficialChaser", 0, VIRTUAL_HEIGHT - 30, VIRTUAL_WIDTH, 'center')
     love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.printf("A game by Chase Maciel", 1, VIRTUAL_HEIGHT - 31, VIRTUAL_WIDTH, 'center')
+    love.graphics.printf("A Game by OfficialChaser", 1, VIRTUAL_HEIGHT - 31, VIRTUAL_WIDTH, 'center')
 end
 
 function StartState:update(dt)

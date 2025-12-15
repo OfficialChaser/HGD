@@ -3,16 +3,18 @@ Level = {}
 -- Example: each level is a table
 Level.levels = {
     [1] = {
-        ballStart = {x = 100, y = 180},
+        ballStart = {x = 100, y = 185},
+        hole = {x = 540, y = 185},
         walls = {
             {x = 50,  y = 110, w = 540, h = 12},
             {x = 50,  y = 250, w = 540, h = 12},
-            {x = 50,  y = 110, w = 12,  h = 140},
-            {x = 578, y = 110, w = 12,  h = 140}
+            {x = 50,  y = 110, w = 12,  h = 152},
+            {x = 578, y = 110, w = 12,  h = 152}
         }
     },
     [2] = {
         ballStart = {x = 100, y = 300},
+        hole = {x = 540, y = 180},
         walls = {
             {x = 0,  y = 0,   w = 640, h = 12},
             {x = 0,  y = 360, w = 640, h = 12},

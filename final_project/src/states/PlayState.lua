@@ -11,6 +11,14 @@ function PlayState:enter(level_num)
     -- Ball
     self.ball = Ball(self.world, self.levelData.ballStart.x, self.levelData.ballStart.y)
 
+    -- Hole
+    self.hole = Hole(
+        self.world,
+        self.levelData.hole.x,
+        self.levelData.hole.y
+    )
+
+
     -- Walls
     self.walls = {}
 
@@ -37,14 +45,28 @@ end
 function PlayState:update(dt)
     self.world:update(dt)
     self.ball:update(dt)
+
+    if self.hole:checkWin(self.ball) then
+        gStateMachine:change('start') -- temporary
+        -- later: next level, score screen, etc.
+    end
 end
 
 function PlayState:render()
-    -- Draw walls
-    love.graphics.setColor(1, 1, 1, 1)
     for _, wall in pairs(self.walls) do
         local x, y = wall.body:getPosition()
 
+        -- Outline
+        love.graphics.setColor(0, 0, 0, 1)
+        love.graphics.rectangle(
+            'fill',
+            x - wall.w / 2 - 2,
+            y - wall.h / 2 - 2,
+            wall.w + 4,
+            wall.h + 4
+        )
+
+        -- Wall fill
         love.graphics.setColor(0.55, 0.27, 0.07, 1)
         love.graphics.rectangle(
             'fill',
@@ -54,6 +76,9 @@ function PlayState:render()
             wall.h
         )
     end
+
+    -- Draw hole
+    self.hole:render()
 
     -- Draw ball
     self.ball:render()

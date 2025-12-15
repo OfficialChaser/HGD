@@ -11,6 +11,7 @@ require 'src/states/PlayState'
 
 -- Entities
 Ball = require 'src/entities/Ball'
+Hole = require 'src/entities/Hole'
 
 -- Assets
 big_font = love.graphics.newFont('fonts/PixelOperator8-Bold.ttf', 48)
@@ -33,8 +34,8 @@ backgroundScrollSpeedY = 30
 
 TILE_SIZE = 32
 
-LIGHT_GREEN = {0.65, 0.85, 0.65, 1}
-DARK_GREEN  = {0.45, 0.75, 0.45, 1}
+LIGHT_GREEN = {0.62, 0.84, 0.55, 1}
+DARK_GREEN  = {0.36, 0.68, 0.38, 1}
 
 function drawCheckeredBackground()
     local tilesX = math.ceil(VIRTUAL_WIDTH / TILE_SIZE) + 1
@@ -54,6 +55,12 @@ function drawCheckeredBackground()
             local x = col * TILE_SIZE + backgroundOffsetX
             local y = row * TILE_SIZE + backgroundOffsetY - TILE_SIZE
             love.graphics.rectangle('fill', x, y, TILE_SIZE, TILE_SIZE)
+
+            -- Optional: Draw tile borders for better visibility
+            love.graphics.setColor(0, 0, 0, 0.05) 
+            love.graphics.setLineWidth(4)
+            love.graphics.rectangle('line', x, y, TILE_SIZE, TILE_SIZE)
+
         end
     end
 end
