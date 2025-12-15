@@ -30,6 +30,11 @@ function PlayState:enter(level_num)
             'static'
         )
 
+        -- Set rotation if specified (convert degrees to radians)
+        if w.rotation then
+            body:setAngle(math.rad(w.rotation))
+        end
+
         local shape = love.physics.newRectangleShape(w.w, w.h)
         local fixture = love.physics.newFixture(body, shape)
 
@@ -76,13 +81,18 @@ end
 function PlayState:render()
     for _, wall in pairs(self.walls) do
         local x, y = wall.body:getPosition()
+        local angle = wall.body:getAngle()
+
+        love.graphics.push()
+        love.graphics.translate(x, y)
+        love.graphics.rotate(angle)
 
         -- Outline
         love.graphics.setColor(0, 0, 0, 1)
         love.graphics.rectangle(
             'fill',
-            x - wall.w / 2 - 2,
-            y - wall.h / 2 - 2,
+            -wall.w / 2 - 2,
+            -wall.h / 2 - 2,
             wall.w + 4,
             wall.h + 4
         )
@@ -91,11 +101,13 @@ function PlayState:render()
         love.graphics.setColor(0.55, 0.27, 0.07, 1)
         love.graphics.rectangle(
             'fill',
-            x - wall.w / 2,
-            y - wall.h / 2,
+            -wall.w / 2,
+            -wall.h / 2,
             wall.w,
             wall.h
         )
+
+        love.graphics.pop()
     end
 
     -- Draw hole
