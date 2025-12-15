@@ -22,8 +22,12 @@ track1 = love.audio.newSource('sounds/track1.mp3', 'stream')
 track2 = love.audio.newSource('sounds/track2.mp3', 'stream')
 track3 = love.audio.newSource('sounds/track3.mp3', 'stream')
 
+ball_drop = love.audio.newSource('sounds/ball_drop.mp3', 'static')
+hit_wall = love.audio.newSource('sounds/hit_wall.wav', 'static')
+
 -- Misc
 require 'src/Level'
+Transition = require 'src/Transition'
 
 -- Background
 backgroundOffsetX = 0

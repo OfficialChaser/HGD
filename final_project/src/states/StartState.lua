@@ -29,7 +29,10 @@ function StartState:update(dt)
 end
 
 function StartState:keypressed(key)
-    if key then
-        gStateMachine:change('play', 1)
+    if key and not Transition.active then
+        Transition:start(function()
+            gStateMachine:change('play', 1)
+        end)
+        
     end
 end

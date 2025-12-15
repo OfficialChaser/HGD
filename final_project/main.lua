@@ -42,6 +42,7 @@ end
 
 -------------------------------------------------
 function love.update(dt)
+    Transition:update(dt)
     gStateMachine:update(dt)
 end
 
@@ -83,6 +84,7 @@ function love.keypressed(key)
     if key == 'escape' then
         love.event.quit()
     end
+
 end
 
 -------------------------------------------------
@@ -90,6 +92,7 @@ function love.draw()
     push:start()
     drawCheckeredBackground()
     gStateMachine:render()
+    Transition:render()
     push:finish()
 end
 

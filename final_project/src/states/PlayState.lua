@@ -40,15 +40,21 @@ function PlayState:enter(level_num)
             h = w.h
         })
     end
+
+    self.won = false
 end
 
 function PlayState:update(dt)
     self.world:update(dt)
     self.ball:update(dt)
+    self.hole:update(dt)
 
-    if self.hole:checkWin(self.ball) then
-        gStateMachine:change('start') -- temporary
-        -- later: next level, score screen, etc.
+    if self.hole:checkWin(self.ball) and not self.won then
+        self.won = true
+        self.hole:startSink(self.ball)
+        ball_drop:play()
+        Transition:start(function()
+            gStateMachine:change('play', self.levelNumber + 1) end, 1.5, 1)
     end
 end
 
@@ -81,7 +87,9 @@ function PlayState:render()
     self.hole:render()
 
     -- Draw ball
-    self.ball:render()
+    if not self.won then
+        self.ball:render()
+    end
 
     -- Draw Level
     love.graphics.setColor(0, 0, 0, 1)
@@ -121,5 +129,11 @@ end
 function PlayState:keypressed(key)
     if key == 'escape' then
         love.event.quit()
+    end
+
+    if key == 'r' and not Transition.active then
+        Transition:start(function()
+            gStateMachine:change('play', gStateMachine.current.levelNumber)
+        end)
     end
 end
