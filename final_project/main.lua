@@ -7,7 +7,6 @@ WINDOW_HEIGHT = 720
 
 require 'src/Dependencies'
 
-
 function love.load()
     math.randomseed(os.time())
     love.graphics.setDefaultFilter('nearest', 'nearest')
@@ -20,31 +19,14 @@ function love.load()
     })
 
     -------------------------------------------------
-    -- PHYSICS WORLD (TOP-DOWN)
+    -- STATE MACHINE
     -------------------------------------------------
-    world = love.physics.newWorld(0, 0)
+    gStateMachine = StateMachine {
+        ['start'] = function() return StartState() end,
+        ['play']  = function() return PlayState()  end
+    }
+    gStateMachine:change('start')
 
-    -------------------------------------------------
-    -- BALL
-    -------------------------------------------------
-    ball = Ball(world, VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT / 2)
-
-    -------------------------------------------------
-    -- WALLS
-    -------------------------------------------------
-    walls = {}
-
-    local function makeWall(x1, y1, x2, y2)
-        local body = love.physics.newBody(world, 0, 0, 'static')
-        local shape = love.physics.newEdgeShape(x1, y1, x2, y2)
-        love.physics.newFixture(body, shape)
-        table.insert(walls, shape)
-    end
-
-    makeWall(0, 0, VIRTUAL_WIDTH, 0)
-    makeWall(0, VIRTUAL_HEIGHT, VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
-    makeWall(0, 0, 0, VIRTUAL_HEIGHT)
-    makeWall(VIRTUAL_WIDTH, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
 end
 
 -------------------------------------------------
@@ -54,40 +36,44 @@ end
 
 -------------------------------------------------
 function love.update(dt)
-    world:update(dt)
-    ball:update(dt)
+    gStateMachine:update(dt)
 end
 
 -------------------------------------------------
 function love.mousepressed(mx, my, button)
-    if button ~= 1 then return end
-
     local x = mx * VIRTUAL_WIDTH / love.graphics.getWidth()
     local y = my * VIRTUAL_HEIGHT / love.graphics.getHeight()
-
-    ball:mousepressed(x, y)
+    if gStateMachine.current.mousepressed then
+        gStateMachine.current:mousepressed(x, y, button)
+    end
 end
 
 -------------------------------------------------
+
 function love.mousereleased(mx, my, button)
-    if button ~= 1 then return end
-
     local x = mx * VIRTUAL_WIDTH / love.graphics.getWidth()
     local y = my * VIRTUAL_HEIGHT / love.graphics.getHeight()
-
-    ball:mousereleased(x, y)
+    if gStateMachine.current.mousereleased then
+        gStateMachine.current:mousereleased(x, y, button)
+    end
 end
 
 -------------------------------------------------
+
 function love.mousemoved(mx, my)
     local x = mx * VIRTUAL_WIDTH / love.graphics.getWidth()
     local y = my * VIRTUAL_HEIGHT / love.graphics.getHeight()
-
-    ball:mousemoved(x, y)
+    if gStateMachine.current.mousemoved then
+        gStateMachine.current:mousemoved(x, y)
+    end
 end
+
 
 -------------------------------------------------
 function love.keypressed(key)
+    if gStateMachine.current.keypressed then
+        gStateMachine.current:keypressed(key)
+    end
     if key == 'escape' then
         love.event.quit()
     end
@@ -96,13 +82,8 @@ end
 -------------------------------------------------
 function love.draw()
     push:start()
-
-    -- Background
     drawCheckeredBackground()
-
-    -- Ball
-    ball:render()
-
+    gStateMachine:render()
     push:finish()
 end
 
