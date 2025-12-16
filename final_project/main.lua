@@ -35,7 +35,7 @@ function love.load()
     track1:play()
 
     -- Global variables
-    mulligans = 3
+    mulligans = 0
 end
 
 -------------------------------------------------

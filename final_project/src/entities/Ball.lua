@@ -3,14 +3,14 @@ Ball = Class{}
 function Ball:init(world, x, y)
     self.radius = 8
     self.aim_radius = 24
+
+
     self.stop_velocity = 10
+    self.gravity_stop_velocity = 50
 
     self.body = love.physics.newBody(world, x, y, 'dynamic')
     self.shape = love.physics.newCircleShape(self.radius)
     self.fixture = love.physics.newFixture(self.body, self.shape)
-
-    self.body:setLinearDamping(1)
-    self.fixture:setRestitution(1)
     
     self.dragging = false
 
@@ -19,12 +19,21 @@ function Ball:init(world, x, y)
     self.strokes = 0
 
     self.prevX, self.prevY = x, y
+
+    self.gravity = false
 end
 
 function Ball:update(dt)
     local vx, vy = self.body:getLinearVelocity()
     self.speed = math.sqrt(vx * vx + vy * vy)
-    if self.speed < self.stop_velocity then
+
+    -- No Gravity mode
+    if self.speed < self.stop_velocity and not self.gravity then
+        self.body:setLinearVelocity(0, 0)
+    end
+
+    -- Gravity mode
+    if self.gravity and vx < self.gravity_stop_velocity and math.abs(vy) < 0.01 then
         self.body:setLinearVelocity(0, 0)
     end
 end
@@ -56,6 +65,8 @@ function Ball:mousereleased(x, y)
 
     local fx = self.startX - x
     local fy = self.startY - y
+    if math.floor(fx + fy) == 0 then return end
+
     self.prevX, self.prevY = self.body:getPosition()
     self.body:applyLinearImpulse(fx * 2, fy * 2)
     self.strokes = self.strokes + 1
@@ -68,8 +79,7 @@ function Ball:render()
     love.graphics.setLineWidth(2)
     
     -- Aim radius
-    if self.speed == 0 then
-        
+    if math.floor(self.speed) == 0 then
         love.graphics.setColor(0, 0, 0, 0.15)
         love.graphics.circle('fill', bx, by, self.aim_radius)
     end
@@ -88,6 +98,20 @@ function Ball:render()
         if self.endX and self.endY then
             love.graphics.line(self.startX, self.startY, self.endX, self.endY)
         end
+    end
+end
+
+function Ball:setGravityMode(enabled)
+    if enabled then
+        -- Less damping so gravity can pull the ball naturally
+        self.body:setLinearDamping(1)
+        self.fixture:setRestitution(0)
+        self.aim_radius = 32
+        self.gravity = true
+    else
+        -- More damping for top-down precision putting
+        self.body:setLinearDamping(1)
+         self.fixture:setRestitution(1)
     end
 end
 

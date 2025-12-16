@@ -28,6 +28,7 @@ end
 
 function Transition:update(dt)
     if not self.active then return end
+    print(self.delay, self.delayTimer, self.phase)
 
     if self.phase == 'delay' then
         self.delayTimer = self.delayTimer + dt

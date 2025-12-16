@@ -5,21 +5,46 @@ function PlayState:enter(level_num)
     self.levelNumber = level_num
     self.levelData = Level:get(self.levelNumber)
 
-    -- Physics world
-    self.world = love.physics.newWorld(0, 0)
+    -------------------------------------------------
+    -- PHYSICS WORLD (OPTIONAL GRAVITY PER LEVEL)
+    -------------------------------------------------
+    local gx, gy = 0, 0
 
-    -- Ball
-    self.ball = Ball(self.world, self.levelData.ballStart.x, self.levelData.ballStart.y)
+    if self.levelData.gravity then
+        -- Default downward gravity
+        if type(self.levelData.gravity) == 'table' then
+            gx = self.levelData.gravity.x or 0
+            gy = self.levelData.gravity.y or 0
+        else
+            gy = 300
+        end
+    end
 
-    -- Hole
+    self.world = love.physics.newWorld(gx, gy)
+
+    -------------------------------------------------
+    -- BALL
+    -------------------------------------------------
+    self.ball = Ball(
+        self.world,
+        self.levelData.ballStart.x,
+        self.levelData.ballStart.y
+    )
+
+    self.ball:setGravityMode(self.levelData.gravity)
+
+    -------------------------------------------------
+    -- HOLE
+    -------------------------------------------------
     self.hole = Hole(
         self.world,
         self.levelData.hole.x,
         self.levelData.hole.y
     )
 
-
-    -- Walls
+    -------------------------------------------------
+    -- WALLS
+    -------------------------------------------------
     self.walls = {}
 
     for _, w in pairs(self.levelData.walls) do
@@ -30,13 +55,12 @@ function PlayState:enter(level_num)
             'static'
         )
 
-        -- Set rotation if specified (convert degrees to radians)
         if w.rotation then
             body:setAngle(math.rad(w.rotation))
         end
 
         local shape = love.physics.newRectangleShape(w.w, w.h)
-        local fixture = love.physics.newFixture(body, shape)
+        love.physics.newFixture(body, shape)
 
         table.insert(self.walls, {
             body = body,
@@ -48,6 +72,7 @@ function PlayState:enter(level_num)
 
     self.won = false
 end
+
 
 function PlayState:update(dt)
     self.world:update(dt)
@@ -61,18 +86,19 @@ function PlayState:update(dt)
         if self.levelNumber == #Level.levels then
             -- Last level completed
             Transition:start(function()
-                gStateMachine:change('start', 1) end, 1.5, 1)
+                gStateMachine:change('start', 1) end, 1, 0)
             return
         end
         Transition:start(function()
             gStateMachine:change('play', self.levelNumber + 1) end, 1.5, 1)
     end
 
-    if  self.ball.strokes == self.levelData.par and self.ball.body:getLinearVelocity() == 0 and not self.won then
+    if  self.ball.strokes == self.levelData.par and self.ball.body:getLinearVelocity() == 0 and not self.won and not Transition.active then
         if mulligans <= 0 then
             Transition:start(function()
-                gStateMachine:change('start', self.levelNumber) end, 1.5, 1)
-        else
+                gStateMachine:change('start', 1) end, 1.5, 1)
+            return
+            else
             self:mulligan()
         end
     end
