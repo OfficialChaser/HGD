@@ -21,6 +21,8 @@ function Ball:init(world, x, y)
     self.prevX, self.prevY = x, y
 
     self.gravity = false
+
+    self.mulligan_warning = false
 end
 
 function Ball:update(dt)
@@ -77,6 +79,21 @@ function Ball:render()
     local bx, by = self.body:getPosition()
     
     love.graphics.setLineWidth(2)
+
+    -- Mulligan preview
+    if mulligans > 0 then
+        if self.mulligan_warning then
+            love.graphics.setColor(1, 0, 0, 0.5)
+        else
+            love.graphics.setColor(0, 0, 0, 0.5)
+        end
+        local mx = math.floor(self.prevX)
+        local my = math.floor(self.prevY)
+        love.graphics.circle('fill', mx, my, self.radius + 1)
+        love.graphics.setColor(1, 1, 1, 0.5)
+        love.graphics.setFont(small_font)
+        love.graphics.printf('M', mx - 30, my - 4, 60, 'center')
+    end
     
     -- Aim radius
     if math.floor(self.speed) == 0 then
@@ -99,6 +116,16 @@ function Ball:render()
             love.graphics.line(self.startX, self.startY, self.endX, self.endY)
         end
     end
+
+    -- Mulligan Warning
+    if self.mulligan_warning then
+        tx = math.floor(bx)
+        ty = math.floor(by)
+        love.graphics.setFont(small_font)
+        love.graphics.setColor(1, 0, 0, 1)
+        love.graphics.printf('Press [M] to use a mulligan', tx - 50, ty - 30, 100, 'center')
+    end
+
 end
 
 function Ball:setGravityMode(enabled)

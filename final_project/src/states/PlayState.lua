@@ -93,13 +93,13 @@ function PlayState:update(dt)
             gStateMachine:change('play', self.levelNumber + 1) end, 1.5, 1)
     end
 
-    if  self.ball.strokes == self.levelData.par and self.ball.body:getLinearVelocity() == 0 and not self.won and not Transition.active then
+    if  self.ball.strokes == self.levelData.par and self.ball.speed == 0 and not self.won and not Transition.active then
         if mulligans <= 0 then
             Transition:start(function()
                 gStateMachine:change('start', 1) end, 1.5, 1)
             return
-            else
-            self:mulligan()
+        else
+            self.ball.mulligan_warning = true
         end
     end
 end
@@ -222,6 +222,7 @@ function PlayState:mulligan()
 
     if past_pos ~= self.ball.body:getPosition() then
         mulligans = mulligans - 1
+        self.ball.mulligan_warning = false
         self.ball.strokes = math.max(0, self.ball.strokes - 1)
     end
 end
