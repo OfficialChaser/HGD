@@ -24,6 +24,8 @@ track3 = love.audio.newSource('sounds/track3.mp3', 'stream')
 
 ball_drop = love.audio.newSource('sounds/ball_drop.mp3', 'static')
 hit_wall = love.audio.newSource('sounds/hit_wall.wav', 'static')
+putt_sound = love.audio.newSource('sounds/putt.mp3', 'static')
+level_win = love.audio.newSource('sounds/level_win.mp3', 'static')
 
 -- Misc
 require 'src/Level'

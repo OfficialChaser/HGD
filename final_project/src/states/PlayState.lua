@@ -71,6 +71,7 @@ function PlayState:enter(level_num)
     end
 
     self.won = false
+
 end
 
 
@@ -83,17 +84,30 @@ function PlayState:update(dt)
         self.won = true
         self.hole:startSink(self.ball)
         ball_drop:play()
+        TextTransition:start(
+            self:calculateScoreMessage(),
+            big_font,
+            VIRTUAL_WIDTH / 2,
+            VIRTUAL_HEIGHT / 2,
+            1000,    -- speed
+            0,    -- delay
+            1.5     -- hold
+        )
+        level_win:stop()
+        level_win:play()
         if self.levelNumber == #Level.levels then
             -- Last level completed
             Transition:start(function()
-                gStateMachine:change('start', 1) end, 1, 0)
+                gStateMachine:change('start', 1) end, 2, 2.25)
             return
         end
         Transition:start(function()
-            gStateMachine:change('play', self.levelNumber + 1) end, 1.5, 1)
+            gStateMachine:change('play', self.levelNumber + 1) end, 2, 2.25)
     end
 
-    if  self.ball.strokes == self.levelData.par and self.ball.speed == 0 and not self.won and not Transition.active then
+    local vx, vy = self.ball.body:getLinearVelocity()
+    if  self.ball.strokes >= self.levelData.par and (self.ball.speed == 0 or self.ball.gravity and vx < self.ball.gravity_stop_velocity and math.abs(vy) < 0.01) and not self.won and not Transition.active then
+        self.ball.restrict = true
         if mulligans <= 0 then
             Transition:start(function()
                 gStateMachine:change('start', 1) end, 1.5, 1)
@@ -158,6 +172,12 @@ function PlayState:render()
         love.graphics.print('Click and drag the ball to putt', 120 - 2, 90)
         love.graphics.setColor(1, 1, 1, 1)
         love.graphics.print('Click and drag the ball to putt', 120, 88)
+    elseif self.levelNumber == 2 then
+        love.graphics.setColor(0, 0, 0, 1)
+        love.graphics.setFont(reg_font)
+        love.graphics.print('Press [M]\nto use a mulligan', 22, 160)
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.print('Press [M]\nto use a mulligan', 24, 158)
     end
 
     -- Draw Par
@@ -223,6 +243,25 @@ function PlayState:mulligan()
     if past_pos ~= self.ball.body:getPosition() then
         mulligans = mulligans - 1
         self.ball.mulligan_warning = false
+        self.ball.restrict = false
         self.ball.strokes = math.max(0, self.ball.strokes - 1)
+    end
+end
+
+function PlayState:calculateScoreMessage()
+    local par = self.levelData.par
+    local strokes = self.ball.strokes
+    local diff = strokes - par
+
+    if strokes == 1 then
+        return "Hole-in-one!"
+    end
+
+    if diff == 0 then
+        return "Par!"
+    elseif diff == -1 then
+        return "Birdie!"
+    elseif diff == -2 then
+        return "Eagle!"
     end
 end

@@ -1,5 +1,3 @@
--- MULLIGAN! - Ball Prototype using Ball class
-
 VIRTUAL_WIDTH = 640
 VIRTUAL_HEIGHT = 360
 WINDOW_WIDTH = 1280
@@ -46,6 +44,7 @@ end
 -------------------------------------------------
 function love.update(dt)
     Transition:update(dt)
+    TextTransition:update(dt)
     gStateMachine:update(dt)
 end
 
@@ -95,6 +94,7 @@ function love.draw()
     push:start()
     drawCheckeredBackground()
     gStateMachine:render()
+    TextTransition:render()
     Transition:render()
     push:finish()
 end

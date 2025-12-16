@@ -45,7 +45,32 @@ Level.levels = {
         },
         par = 3,
         gravity = { x = 0, y = 200 }
+    },
+    [4] = {
+        ballStart = {x = 100, y = 200},
+        hole = {x = 550, y = 200},
+        walls = {
+            -- Outer rectangle
+            {x = 50,  y = 100, w = 540, h = 12, rotation = 0}, -- top
+            {x = 50,  y = 300, w = 540, h = 12, rotation = 0}, -- bottom
+            {x = 50,  y = 100, w = 12,  h = 212, rotation = 0}, -- left
+            {x = 578, y = 100, w = 12,  h = 212, rotation = 0}, -- right
+
+            -- Middle horizontal plank
+            {x = 200, y = 180, w = 200, h = 12, rotation = 0},
+
+            -- Slanted ramp to the right
+            {x = 400, y = 150, w = 150, h = 12, rotation = 40}, -- -30 degrees
+
+            -- Slanted ramp to the left
+            {x = 420, y = 230, w = 120, h = 12, rotation = 30}, -- 30 degrees
+
+            -- Near-hole horizontal plank
+            {x = 450, y = 200, w = 100, h = 12, rotation = 0},
+        },
+        par = 3
     }
+
 }
 
 function Level:get(levelNumber)

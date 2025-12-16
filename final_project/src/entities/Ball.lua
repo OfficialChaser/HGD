@@ -23,6 +23,8 @@ function Ball:init(world, x, y)
     self.gravity = false
 
     self.mulligan_warning = false
+
+    self.restrict = false
 end
 
 function Ball:update(dt)
@@ -41,6 +43,7 @@ function Ball:update(dt)
 end
 
 function Ball:mousepressed(x, y)
+    if self.restrict then return end
     local bx, by = self.body:getPosition()
     local dx, dy = x - bx, y - by
 
@@ -55,6 +58,7 @@ function Ball:mousepressed(x, y)
 end
 
 function Ball:mousemoved(x, y)
+    if self.restrict then return end
     if self.dragging then
         self.endX, self.endY = x, y
     else
@@ -63,6 +67,7 @@ function Ball:mousemoved(x, y)
 end
 
 function Ball:mousereleased(x, y)
+    if self.restrict then return end
     if not self.dragging then return end
 
     local fx = self.startX - x
@@ -73,6 +78,9 @@ function Ball:mousereleased(x, y)
     self.body:applyLinearImpulse(fx * 2, fy * 2)
     self.strokes = self.strokes + 1
     self.dragging = false
+
+    putt_sound:stop()
+    putt_sound:play()
 end
 
 function Ball:render()
@@ -96,7 +104,7 @@ function Ball:render()
     end
     
     -- Aim radius
-    if math.floor(self.speed) == 0 then
+    if math.floor(self.speed) == 0 and not self.restrict then
         love.graphics.setColor(0, 0, 0, 0.15)
         love.graphics.circle('fill', bx, by, self.aim_radius)
     end
