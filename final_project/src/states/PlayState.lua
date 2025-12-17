@@ -161,6 +161,7 @@ function PlayState:update(dt)
                         0,    -- delay
                         1.5     -- hold
             )
+            score = 0
             Transition:start(function()
                 gStateMachine:change('start', 1) end, 2, 3.5)
             return
