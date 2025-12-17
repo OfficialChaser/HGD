@@ -209,9 +209,9 @@ function PlayState:render()
     -- Draw Level
     love.graphics.setColor(0, 0, 0, 1)
     love.graphics.setFont(reg_font)
-    love.graphics.print('Level ' .. tostring(self.levelNumber), 8, 12)
+    love.graphics.print('Hole ' .. tostring(self.levelNumber), 8, 12)
     love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.print('Level ' .. tostring(self.levelNumber), 10, 10)
+    love.graphics.print('Hole ' .. tostring(self.levelNumber), 10, 10)
 
     -- Draw Instructions (ignore pls lmao i was rushing)
     if self.levelNumber == 1 then
