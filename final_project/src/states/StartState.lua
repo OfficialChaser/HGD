@@ -16,6 +16,13 @@ function StartState:render()
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.printf("- Press any key -", 2, VIRTUAL_HEIGHT / 2 + 8, VIRTUAL_WIDTH, 'center')
 
+    -- Score
+    love.graphics.setFont(reg_font)
+    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.printf("Best Score: " .. tostring(high_score), 0, VIRTUAL_HEIGHT  - 100, VIRTUAL_WIDTH, 'center')
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.printf("Best Score: " .. tostring(high_score), 2, VIRTUAL_HEIGHT - 102, VIRTUAL_WIDTH, 'center')
+
     -- Credits
     love.graphics.setFont(small_font)
     love.graphics.setColor(0, 0, 0, 1)
@@ -25,6 +32,7 @@ function StartState:render()
 end
 
 function StartState:update(dt)
+    updateBackgroundColor(1)
     backgroundOffsetY = (backgroundOffsetY + backgroundScrollSpeedY * dt) % TILE_SIZE
 end
 
@@ -32,8 +40,7 @@ function StartState:keypressed(key)
     if key and not Transition.active then
         mulligans = 3
         Transition:start(function()
-            gStateMachine:change('play', 4)
+            gStateMachine:change('play', 1)
         end)
-        
     end
 end

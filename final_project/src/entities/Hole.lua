@@ -62,8 +62,11 @@ function Hole:checkWin(ball)
     if dist <= self.triggerRadius then
         local vx, vy = ball.body:getLinearVelocity()
         local speed = math.sqrt(vx * vx + vy * vy)
-
-        if speed <= self.winSpeed then
+        local ws = self.winSpeed
+        if ball.gravity then
+            ws  = ws + 100
+        end
+        if speed <= ws then
             return true
         end
     end

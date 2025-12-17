@@ -37,12 +37,18 @@ backgroundOffsetX = 0
 backgroundOffsetY = 0
 backgroundScrollSpeedX = 20   -- pixels per second
 backgroundScrollSpeedY = 30
-
+background_color = 'green'
 
 TILE_SIZE = 32
 
 LIGHT_GREEN = {0.62, 0.84, 0.55, 1}
 DARK_GREEN  = {0.36, 0.68, 0.38, 1}
+
+LIGHT_RED = {0.96, 0.62, 0.62, 1}
+DARK_RED  = {0.84, 0.36, 0.36, 1}
+
+LIGHT_BLUE = {0.62, 0.76, 0.96, 1}
+DARK_BLUE  = {0.36, 0.52, 0.84, 1}
 
 function drawCheckeredBackground()
     local tilesX = math.ceil(VIRTUAL_WIDTH / TILE_SIZE) + 1
@@ -53,9 +59,21 @@ function drawCheckeredBackground()
             -- Determine color using integer indices
             local check = (col + row) % 2
             if check == 0 then
-                love.graphics.setColor(LIGHT_GREEN)
+                if background_color == 'red' then
+                    love.graphics.setColor(LIGHT_RED)
+                elseif background_color == 'blue' then
+                    love.graphics.setColor(LIGHT_BLUE)
+                elseif background_color == 'green' then
+                    love.graphics.setColor(LIGHT_GREEN)
+                end
             else
-                love.graphics.setColor(DARK_GREEN)
+                if background_color == 'red' then
+                    love.graphics.setColor(DARK_RED)
+                elseif background_color == 'green' then
+                    love.graphics.setColor(DARK_GREEN)
+                elseif background_color == 'blue' then
+                    love.graphics.setColor(DARK_BLUE)
+                end
             end
 
             -- Draw tile with offset
@@ -69,6 +87,27 @@ function drawCheckeredBackground()
             love.graphics.rectangle('line', x, y, TILE_SIZE, TILE_SIZE)
 
         end
+    end
+end
+
+function updateBackgroundColor(level_num)
+    if level_num <= 3 then
+        background_color = 'green'
+        if not track1:isPlaying() then
+            track2:stop()
+            track3:stop()
+            track1:play()
+        end
+    elseif level_num <= 6 then
+        background_color = 'red'
+            track1:stop()
+            track3:stop()
+            track2:play()
+    else
+        background_color = 'blue'
+            track1:stop()
+            track2:stop()
+            track3:play()
     end
 end
 

@@ -34,6 +34,8 @@ function love.load()
 
     -- Global variables
     mulligans = 0
+    score = 0
+    high_score = 0
 end
 
 -------------------------------------------------
