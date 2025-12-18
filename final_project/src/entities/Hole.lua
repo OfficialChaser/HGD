@@ -6,7 +6,7 @@ function Hole:init(world, x, y)
 
     self.radius = 14        -- visual hole size
     self.triggerRadius = 12 -- collision threshold
-    self.winSpeed = 220     -- max speed to count as sunk
+    self.winSpeed = 270     -- max speed to count as sunk
 
     -- Physics sensor (still useful later)
     self.body = love.physics.newBody(world, x, y, 'static')
