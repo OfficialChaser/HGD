@@ -382,12 +382,11 @@ function PlayState:keypressed(key)
         love.event.quit()
     end
     
-    -- Cheat mode
-    -- if key == 'r' and not Transition.active then
-    --     Transition:start(function()
-    --         gStateMachine:change('play', gStateMachine.current.levelNumber)
-    --     end)
-    -- end
+    if key == 'r' and not Transition.active then
+        Transition:start(function()
+            gStateMachine:change('start')
+        end)
+    end
 
     if key == 'm' and mulligans > 0 and not Transition.active and self.ball.body:getLinearVelocity() == 0 then
         self:mulligan()
