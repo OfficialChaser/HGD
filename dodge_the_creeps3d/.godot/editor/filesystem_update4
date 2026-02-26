@@ -1,0 +1,11 @@
+res://Main.tscn
+res://MusicPlayer.tscn
+res://Player.tscn
+res://Mob.tscn
+res://mob/Mob.tscn
+res://player/Player.tscn
+res://main_scenes/Main.tscn
+res://managers/game_manager.gd
+res://ui/ScoreLabel.gd
+res://main_scenes/Main.gd
+res://characters/player/Player.gd

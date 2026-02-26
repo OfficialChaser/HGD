@@ -1,0 +1,83 @@
+[gd_scene load_steps=12 format=3 uid="uid://scm75bq8co21"]
+
+[ext_resource type="PackedScene" uid="uid://bdcg8crdqhyaj" path="res://player/player.tscn" id="1_53q0u"]
+[ext_resource type="Script" uid="uid://ccalgu7t2m8b8" path="res://main/main.gd" id="1_c651c"]
+[ext_resource type="PackedScene" uid="uid://c68uqforao6ka" path="res://UI/gui.tscn" id="1_xwkvk"]
+[ext_resource type="PackedScene" uid="uid://jkrngohgy2l3" path="res://mob/mob.tscn" id="2_pjrb6"]
+[ext_resource type="PackedScene" uid="uid://cg4tuu44mag0m" path="res://coin.tscn" id="3_3wy1v"]
+[ext_resource type="AudioStream" uid="uid://sgfduhhw4pno" path="res://art/House In a Forest Loop.ogg" id="6_kfbq2"]
+
+[sub_resource type="Curve2D" id="Curve2D_pjrb6"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 480, 0, 0, 0, 0, 0, 480, 720, 0, 0, 0, 0, 0, 720, 0, 0, 0, 0, 0, 0)
+}
+point_count = 5
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_c651c"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_3wy1v"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_kfbq2"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_4dugh"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_c651c")
+mob_scene = ExtResource("2_pjrb6")
+coin_scene = ExtResource("3_3wy1v")
+
+[node name="Player" parent="." instance=ExtResource("1_53q0u")]
+position = Vector2(240, 496)
+speed = 500.0
+acc = 10.0
+dec = 20.0
+
+[node name="MobPath" type="Path2D" parent="."]
+curve = SubResource("Curve2D_pjrb6")
+
+[node name="MobSpawnLocation" type="PathFollow2D" parent="MobPath"]
+
+[node name="Boundaries" type="Node" parent="."]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Boundaries"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boundaries/StaticBody2D"]
+position = Vector2(248, 720)
+shape = SubResource("WorldBoundaryShape2D_c651c")
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="Boundaries"]
+rotation = 1.5707964
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boundaries/StaticBody2D2"]
+position = Vector2(336, -1.4687026e-05)
+shape = SubResource("WorldBoundaryShape2D_3wy1v")
+
+[node name="StaticBody2D3" type="StaticBody2D" parent="Boundaries"]
+position = Vector2(480, 336)
+rotation = -1.5707964
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boundaries/StaticBody2D3"]
+position = Vector2(336, -239.99998)
+rotation = -1.5707964
+shape = SubResource("WorldBoundaryShape2D_kfbq2")
+
+[node name="StaticBody2D4" type="StaticBody2D" parent="Boundaries"]
+position = Vector2(320, 168)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Boundaries/StaticBody2D4"]
+position = Vector2(160, 168)
+rotation = -1.5707964
+shape = SubResource("WorldBoundaryShape2D_4dugh")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="GUI" parent="CanvasLayer" instance=ExtResource("1_xwkvk")]
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("6_kfbq2")
+volume_db = -12.0
+autoplay = true
+
+[connection signal="hit" from="Player" to="." method="_on_player_hit"]
+[connection signal="spawn_coin" from="CanvasLayer/GUI" to="." method="_on_gui_spawn_coin"]
+[connection signal="spawn_mob" from="CanvasLayer/GUI" to="." method="_on_gui_spawn_mob"]
