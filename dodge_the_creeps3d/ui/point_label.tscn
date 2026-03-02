@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://dvpvhj2gsmufd"]
+
+[node name="PointLabel" type="Label3D"]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0.07209015, 0)
+text = "+1"
+font_size = 256
+outline_size = 72

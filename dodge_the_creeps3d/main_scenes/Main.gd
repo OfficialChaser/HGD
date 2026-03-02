@@ -1,6 +1,7 @@
 extends Node
 
 @export var mob_scene: PackedScene
+@export var point_label_scene: PackedScene
 
 var score := 0
 
@@ -50,5 +51,11 @@ func _on_player_hit():
 	$UserInterface/ScoreLabel.hide()
 	$UserInterface/Retry.show()
 
-func _on_Mob_squashed():
+func _on_Mob_squashed(mob_global_pos):
 	GameManager.score += 1
+	
+	var label = point_label_scene.instantiate()
+	label.global_position = mob_global_pos
+	
+	add_child(label)
+	

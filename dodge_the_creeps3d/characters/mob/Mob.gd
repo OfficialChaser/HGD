@@ -1,7 +1,7 @@
 extends CharacterBody3D
 
 # Emitted when the player jumped on the mob.
-signal squashed
+signal squashed(global_pos)
 
 ## Minimum speed of the mob in meters per second.
 @export var min_speed = 10
@@ -33,7 +33,7 @@ func initialize(start_position, player_position):
 
 
 func squash():
-	squashed.emit()
+	squashed.emit(global_position)
 	queue_free()
 
 
