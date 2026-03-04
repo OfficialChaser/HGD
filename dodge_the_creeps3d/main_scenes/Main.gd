@@ -2,6 +2,7 @@ extends Node
 
 @export var mob_scene: PackedScene
 @export var point_label_scene: PackedScene
+@export var mob_particles_scene: PackedScene
 
 var score := 0
 
@@ -50,12 +51,23 @@ func _on_player_hit():
 	$MobTimer.stop()
 	$UserInterface/ScoreLabel.hide()
 	$UserInterface/Retry.show()
+	$DeathSFX.play()
 
 func _on_Mob_squashed(mob_global_pos):
 	GameManager.score += 1
 	
-	var label = point_label_scene.instantiate()
-	label.global_position = mob_global_pos
 	
+	var label = point_label_scene.instantiate()
 	add_child(label)
+	
+	label.global_position = mob_global_pos
+	label.global_position += Vector3(0, 2, 0)
+	label.rotation = Vector3(-45, 0, 0)
+	
+	var mob_splat_particles = mob_particles_scene.instantiate()
+	add_child(mob_splat_particles)
+	mob_splat_particles.global_position = mob_global_pos
+	mob_splat_particles.emitting = true
+	
+	
 	

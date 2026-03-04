@@ -1,5 +1,6 @@
-res://ui/score_label.tscn
-res://ui/point_label.tscn
+res://mob_splat_particles.tscn
+res://splat_sfx.gd
+res://characters/player/Player.tscn
+res://characters/player/Player.gd
 res://main_scenes/Main.tscn
-res://characters/mob/Mob.gd
 res://main_scenes/Main.gd

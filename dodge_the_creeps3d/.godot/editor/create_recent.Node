@@ -1,2 +1,7 @@
+AudioStreamPlayer
+AudioStreamPlayer3D
+AnimationPlayer
+GPUParticles3D
+CPUParticles3D
 Label3D
 Label

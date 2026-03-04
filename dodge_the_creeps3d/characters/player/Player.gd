@@ -12,6 +12,7 @@ signal hit
 @export var fall_acceleration = 75
 
 
+
 func _physics_process(delta):
 	var direction = Vector3.ZERO
 	if Input.is_action_pressed(&"move_right"):

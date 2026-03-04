@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://bqg57mv5xe1ej"]
+
+[ext_resource type="AudioStream" uid="uid://bkjp7u1ilvnv8" path="res://player_death.mp3" id="1_d3os4"]
+
+[node name="DeathSFX" type="AudioStreamPlayer3D" unique_id=1259776950]
+stream = ExtResource("1_d3os4")
